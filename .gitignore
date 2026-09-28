@@ -1,0 +1,5 @@
+Terraform/Day-1/.terraform.lock.hcl
+Terraform/Day-1/terraform.tfstate
+Terraform/Day-1/terraform.tfstate.backup
+Terraform/Day-1/.terraform/providers/registry.terraform.io/hashicorp/aws/6.66.0/linux_amd64/LICENSE.txt
+Terraform/Day-1/.terraform/providers/registry.terraform.io/hashicorp/aws/6.66.0/linux_amd64/terraform-provider-aws_v6.66.0_x5
