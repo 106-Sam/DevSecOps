@@ -8,6 +8,6 @@
 
 
 
-In interviews, from 100%, 75% question will be of DevOps (GitHub, Terraform, Kubernetes, Docker, etc.)
+In interviews, from 100%, 75% question will be of DevOps (GitHub, Terraform, Kubernetes, Docker, Ansible etc.)
 
 25% - Cloud [AWS, Azure, GCP]
