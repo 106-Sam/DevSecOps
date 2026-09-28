@@ -2,7 +2,7 @@
 
 **Index of Content**
 
-1. [Terraform Introduction](https://github.com/106-Sam/DevOps/Terraform#1-terraform-introduction)
+1. [Terraform Introduction](https://github.com/106-Sam/DevOps/tree/main/Terraform#1-terraform-introduction)
 2. 
 
 
