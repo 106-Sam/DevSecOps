@@ -24,6 +24,7 @@
 20. [AWS Backup (Vaults)](https://github.com/106-sam/DevOps/tree/main/AWS#20-aws-backup-vaults)
 21. [VPN & connection between AZURE & AWS](https://github.com/106-sam/DevOps/tree/main/AWS#21-vpn--connection-between-azure--aws-machines)
 22. [DynamoDB, Lambda function, API Gateway]()
+23. [SSL_CERTIFICATES]()
 
 --- 
 
