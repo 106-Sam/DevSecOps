@@ -31,3 +31,4 @@ resource "aws_subnet" "subnetB"{
         Name = "subnetB"
     }
 }
+
