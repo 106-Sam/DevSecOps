@@ -1,0 +1,8 @@
+region = "ap-south-2a"
+accesskey = "AKIA6DINGSHLDZAIZBVL"
+secretkey = "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"
+vpca_cidr = "10.0.0.0/16"
+vpcb_cidr = "10.1.0.0/16"
+subnetA_cidr = "10.0.1.0/24"
+subnetB_cidr = "10.1.1.0/24"
+anyipaddress = "0.0.0.0/0"
