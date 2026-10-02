@@ -6,3 +6,6 @@ variable "vpcb_cidr" {}
 variable "subnetA_cidr" {}
 variable "subnetB_cidr" {}
 variable "anyipaddress" {}
+variable "ami_id" {}
+variable "instance_type" {}
+variable "key_name" {}
