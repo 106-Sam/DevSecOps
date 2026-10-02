@@ -9,8 +9,8 @@ resource "aws_default_security_group" "default-sg-A" {
   }
     ingress {
     protocol  = "icmp"
-    from_port = 0
-    to_port   = 0
+    from_port = -1
+    to_port   = -1
     cidr_blocks = [var.subnetB_cidr]
   }
 
@@ -36,8 +36,8 @@ resource "aws_default_security_group" "default-sg-B" {
   }
     ingress {
     protocol  = "icmp"
-    from_port = 0
-    to_port   = 0
+    from_port = -1
+    to_port   = -1
     cidr_blocks = [var.subnetA_cidr]
   }
 
