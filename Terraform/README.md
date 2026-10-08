@@ -3,7 +3,7 @@
 **Index of Content**
 
 1. [Terraform Introduction](https://github.com/106-Sam/DevOps/tree/main/Terraform#1-terraform-introduction)
-2. [VPC Peering](https://github.com/106-Sam/DevOps/tree/main/Terraform#vpc-peering)
+2. [VPC Peering](https://github.com/106-Sam/DevOps/tree/main/Terraform#2-vpc-peering)
 
 
 
