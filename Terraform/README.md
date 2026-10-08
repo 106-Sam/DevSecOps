@@ -3,7 +3,7 @@
 **Index of Content**
 
 1. [Terraform Introduction](https://github.com/106-Sam/DevOps/tree/main/Terraform#1-terraform-introduction)
-2. 
+2. [VPC Peering](https://github.com/106-Sam/DevOps/tree/main/Terraform#vpc-peering)
 
 
 
@@ -99,6 +99,9 @@ We usually hide the credentials in the .env file but as per the practice now
 `terraform apply` > yes
 
 
+## 2. VPC Peering
+
+[Terraform code](https://github.com/106-sam/DevOps/Terraform/VPC-Peering)
 
 
 
