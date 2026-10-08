@@ -101,7 +101,7 @@ We usually hide the credentials in the .env file but as per the practice now
 
 ## 2. VPC Peering
 
-[Terraform code](https://github.com/106-sam/DevOps/Terraform/VPC-Peering)
+[Terraform code](https://github.com/106-Sam/DevOps/tree/main/Terraform/VPC-Peering)
 
 
 
