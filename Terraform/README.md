@@ -104,6 +104,15 @@ We usually hide the credentials in the .env file but as per the practice now
 [Terraform code](https://github.com/106-Sam/DevOps/tree/main/Terraform/VPC-Peering)
 
 
+``` hcl
 
+#VPC Creation
+# Resource Block, Resource Type, Reference Name
+resource "aws_vpc" "main"{
+  cidr = "10.0.0.0/16"
+}
+
+```
+We cannot edit the Resource Block and Resource Type, but we can change the Reference Name.
 
 
