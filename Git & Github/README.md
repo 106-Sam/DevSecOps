@@ -34,3 +34,14 @@ GitHub is a cloud-based platform that hosts those code repositories so teams can
 | Internet | Works *offline* | Requires an *Internet connection* |
 | Ownership | OpenSource (maintained by the Linux Community) | Owned by *Microsoft* |
 
+
+### Installation of Git
+
+- Firstly, go to https://git-scm.com/install download as per your operating system.
+- git commands can be executed from powershell, command prompt, vs code, git bash, etc.
+- *README.MD* file used for documentation of the repo.
+- *.gitignore* file is used for not tracking that file. Basically, it will not allow push those file to the GitHub.
+
+### To work on the existing Repo
+
+Step 1: Clone that repository `git clone <url of the repo>`
