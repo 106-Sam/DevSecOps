@@ -51,9 +51,10 @@ GitHub is a cloud-based platform that hosts those code repositories so teams can
 - git commands can be executed from powershell, command prompt, vs code, git bash, etc.
 - *README.MD* file used for documentation of the repo.
 - *.gitignore* file is used for not tracking that file. Basically, it will not allow push those file to the GitHub.
-- Whenever you see a .git file (which is hidden) it means it is a git project. 
+- Whenever you see a .git directory (which is hidden) it means it is a git project. 
 - Internally git server will be running over there.
-- To work on the existing Repo Clone that repository `git clone <url of the repo>`
+  
+1. To work on the existing Repo Clone that repository `git clone <url of the repo>`
 - by default, we will have multiple stages. 
   - *Working area* - Whenever we make some new changes or create file in the git project it will be in the working area. 
     - You need to use `git status`, it isn't able to track those changes or file. (red color)
@@ -88,8 +89,31 @@ Step 4: It will prompt auth during `git push` choose token > paste the token and
 
 ## Day 2 - Merge Conflicts and Branching Strategies
 
+2. We are going to create a new repo and then work on it.
+
+- `git init` - it will initialize the current working directory and create .git directory
+- `git add .` - to track all the current working directory files then,
+- `git commit -m " "`  - it will move the changes to commit area locally
+- when we try to push the code it doesn't work as there is no destination for that so, first we create an repo on the GitHub site and use the command `git remote add origin <url>`
+ ex: `git remote add origin https://github.com/106-sam/Acube.git`
+ - `git remote -v` - to check the destination details.
+ - `git push -u origin main/master` - push the code for the first time.
 
 
+### Merge Conflicts 
+
+Merge conflicts often happen when people make different changes to the same line of the same file, or when one person edits a file and another person deletes the same file.
+
+[click here](https://docs.github.com/en/pull-requests/reference/merge-conflicts)
+
+To resolve the conflicts, the two persons need to sit together and decide which changes are right and keep them. After that they pull the repo
+
+Once solved just do this 
+`git rebase --continue` 
+`git push -u origin main/master`
+
+
+### Branching Strategy
 
 
 
