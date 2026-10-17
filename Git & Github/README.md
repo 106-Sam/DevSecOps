@@ -2,7 +2,7 @@
 
 **Index of Content**
 
-1. [Day 1 - Version Control System in Git](https://github.com/106-Sam/DevOps/tree/main/Git%20%26%20Github#day-1-)
+1. [Day 1 - Version Control System in Git](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-1---version-control-system-in-git)
 
 
 
