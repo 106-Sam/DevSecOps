@@ -41,7 +41,35 @@ GitHub is a cloud-based platform that hosts those code repositories so teams can
 - git commands can be executed from powershell, command prompt, vs code, git bash, etc.
 - *README.MD* file used for documentation of the repo.
 - *.gitignore* file is used for not tracking that file. Basically, it will not allow push those file to the GitHub.
+- Whenever you see a .git file (which is hidden) it means it is a git project. 
+- Internally git server will be running over there.
+- To work on the existing Repo Clone that repository `git clone <url of the repo>`
+- by default, we will have multiple stages. 
+  - *Working area* - Whenever we make some new changes or create file in the git project it will be in the working area. 
+    - You need to use `git status`, it isn't able to track those changes or file. (red color)
+    - To add it to the git project, use `git add .` or `git add <filespathwithnames>`it wil make all the file in track. These changes will be moved to the index/stage area.
+  - *Stage/Index area* - Now, `git status` shows it is able to track those changes or file (green color) 
+    - Use `git commit -m "<message descp>"` -m means message box and now it will take the tracked file / changes /files to commit area
+  - *Commit area* - `git log` These all commits are maintained locally. it shows us the commits and those changes aren't yet pushed to GitHub so they will not be appear on the repo. 
+    - before push command
+        ![alt text](files/image1.png)
 
-### To work on the existing Repo
+    - we can authenticate via the username/password, but we will authenticate with the token:
+    - `git push` 
 
-Step 1: Clone that repository `git clone <url of the repo>`
+
+### How to get the authentication token 
+
+Step 1: Click on the project picture > Settings > Developer Setting (scroll down)
+Step 2: Personal access tokens (PAT)  > Token (classic)
+Step 3: Generate new token classic > it will prompt for password > Note (write something) > expire date > Select the scope are per you requirement. > generate > copy the token.
+Step 4: It will prompt auth during `git push` choose token > paste the token and sign in
+
+
+### Git logs commands 
+
+- `git log` - proivde us complete information of the logs.
+- `git log --oneline` - provides us with short descp informaton of the logs.
+
+- `git pull` - When we execute git pull it will update the code in the local so that it is same on the repo
+- We use `git pull` before `git push` to have prevent the error and issue that will occur later.
