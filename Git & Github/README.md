@@ -115,6 +115,32 @@ Once solved just do this
 
 ### Branching Strategy
 
+Whenever we create a branch, it creates an exact replica of main/master branch along with the commits.
+
+In the new feature branch, we will update the code for the new feature and work on that branch only. And after testing it on the all environments (dev, stage, release, prod) when everything is working fine only then we will merge the code to the main branch by raising Pull Request (PR)
+
+Then the PR request is verfied by the Manager or Team Lead and accept it.
+
+Feature Branch - for creating new feature and getting things ready
+Release Branch - this is when the code is ready to deploy. It comes after testing is done.
+Hotfix Branch - temp fix for the bugs found on the prod 
+
+
+`git branch` - to list the branches
+`git branch <branch-name>` - to create a new branch
+`git switch <branch-name>` - to switch the branch to new branch
+`git branch -d <branch-name>` - to delete the branch
+
+_Note: * mark represent the present working branch_
+
+#### Instead of using 2 commands for creating & switching branch do this:
+
+`git checkout -b <branch-name>` - it creates and switches the branch 
+
+
+`git push origin <branch-name>` - to push the new branch after the commit
+
+and then we need to raise a PR
 
 
 
