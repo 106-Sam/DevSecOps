@@ -84,3 +84,6 @@ Step 4: It will prompt auth during `git push` choose token > paste the token and
 - `git pull` - When we execute git pull it will update the code in the local so that it is same on the repo
 - We use `git pull` before `git push` to have prevent the error and issue that will occur later.
 - And while pulling we might get the merge conflicts.
+
+
+## Day 2 - Merge Conflicts and Branching Strategies
