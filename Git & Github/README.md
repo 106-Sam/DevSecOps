@@ -1,5 +1,14 @@
 # Git and GitHub 
 
+**Index of Content**
+
+1. [Day 1 - Version Control System in Git](https://github.com/106-Sam/DevOps/tree/main/Git%20%26%20Github#day-1-)
+
+
+
+
+
+## DAY 1 - Version Control System in Git
 Version Control: A version control system (VCS) is the software that records changes made to source code, including separate files, sets of files, and any digital assets and related project metadata. This way, the system enables tracking of all project changes and allows developers to revert files to specific versions as needed. Without version control, projects risk becoming disorganized with numerous file versions.
 
 link - [click here](https://www.devart.com/blog/centralized-vs-distributed-version-control.html)
@@ -73,3 +82,4 @@ Step 4: It will prompt auth during `git push` choose token > paste the token and
 
 - `git pull` - When we execute git pull it will update the code in the local so that it is same on the repo
 - We use `git pull` before `git push` to have prevent the error and issue that will occur later.
+- And while pulling we might get the merge conflicts.
