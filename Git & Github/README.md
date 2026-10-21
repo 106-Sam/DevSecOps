@@ -145,7 +145,7 @@ and then we need to raise a PR.
 
 ## Day 3 - Git Merge and Square Rebase
 
-**Merge** - When we *Merge* the `x` branch to the `main/master` branch it keeps the commit history and add one more commit as merge in the `main/master` branch.
+**Merge** - When we *Merge* the `x` branch to the `main/master` branch it keeps the commit history and add one more commit as merge in the `main/master` branch(extra merge).
 
 **Squash Merge** - When we *squash merge* the `x` branch to the `main/master` branch it doesn't keep the commit history and replace all those in one commit as we squash merge in the `master/main` branch.
 
