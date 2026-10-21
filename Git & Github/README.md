@@ -4,7 +4,7 @@
 
 1. [Day 1 - Version Control System in Git](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-1---version-control-system-in-git)
 2. [Day 2 - Merge Conflicts and Branching Strategies](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-2---merge-conflicts-and-branching-strategies)
-3. [Day 3 - Git Merge and Square Rebase](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-3---git-merge-and-square-rebase)
+3. [Day 3 - Git Merge and Square Rebase](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-3---git-merge-square-rebase-cherrypick)
 
 
 
@@ -143,10 +143,122 @@ _Note: * mark represent the present working branch_
 and then we need to raise a PR.
 
 
-## Day 3 - Git Merge and Square Rebase
+## Day 3 - Git Merge Square Rebase CherryPick
 
-**Merge** - When we *Merge* the `x` branch to the `main/master` branch it keeps the commit history and add one more commit as merge in the `main/master` branch(extra merge).
+**Merge** - When we *Merge* the `x` branch to the `main/master` branch it keeps the commit history and add one more commit as merge in the `main/master` branch (merge commit).
+
+``` bash
+
+mkdir merge
+git init
+touch mmmmm
+git add .
+git commit -m "m1"
+touch mmmmm111
+git add .
+git commit -m "m2"
+git log --online  [commits 2]
+
+git checkout -b devbranch
+
+touch dddd
+git add .
+git commit -m "d1"
+touch ddd111
+git add .
+git commit -m "d2"
+
+git switch main
+
+touch mmmm2222
+git add .
+git commit -m "m3"
+
+git merge devbranch 
+exit the file or write message and exit
+git log --oneline [6 commits includes 1 merge commit]
+#this provides us all the commits of devbranch as well
+```
+
 
 **Squash Merge** - When we *squash merge* the `x` branch to the `main/master` branch it doesn't keep the commit history and replace all those in one commit as we squash merge in the `master/main` branch.
 
-**Rebase** - 
+We use squash merge if and only if one person is working on a project.
+
+``` bash
+
+mkdir squash
+git init
+touch mmmmm
+git add .
+git commit -m "m1"
+touch mmmmm111
+git add .
+git commit -m "m2"
+git log --online  [commits 2]
+
+git checkout -b devbranch
+
+touch dddd
+git add .
+git commit -m "d1"
+touch ddd111
+git add .
+git commit -m "d2"
+touch dddddd2222
+git add . 
+git commit -m "d3"
+
+git switch main
+
+touch mmmm2222
+git add .
+git commit -m "m3"
+
+git merge --squash devbranch
+git commit -m "merged devbranch"
+git log --oneline [only 4 commits includes 1 merge commit]
+# this combines all the commits into one merge commit
+```
+
+**Rebase** - When we use *rebase merge* the `x` branch to `main/master` branch it has the linear commit history means it will have all the history in the order without extra merge commit.
+
+``` bash
+
+mkdir rebase
+git init
+touch mmmmm
+git add .
+git commit -m "m1"
+touch mmmmm111
+git add .
+git commit -m "m2"
+git log --online  [commits 2]
+
+git checkout -b devbranch
+
+touch dddd
+git add .
+git commit -m "d1"
+touch ddd111
+git add .
+git commit -m "d2"
+
+
+git switch main
+
+touch mmmm2222
+git add .
+git commit -m "m3"
+git log --oneline [3 commits]
+
+git switch devbranch
+git log --online [4 commits]
+git rebase main
+git log --online [5 commits add m3 commit from main branch]
+
+git switch main
+git rebase devbranch 
+git log --online [5 commits linear history]
+
+# this combines all the commits into one merge commit
