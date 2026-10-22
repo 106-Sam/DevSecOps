@@ -60,7 +60,7 @@ Install Hashicorp Terraform Plugin in VS Code.
 
 Version setting block is important.
 
-``` 
+``` hcl
 # Version Setting Block
 terraform {
   required_providers {
