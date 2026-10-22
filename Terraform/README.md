@@ -4,6 +4,12 @@
 
 1. [Terraform Introduction](https://github.com/106-Sam/DevOps/tree/main/Terraform#1-terraform-introduction)
 2. [VPC Peering](https://github.com/106-Sam/DevOps/tree/main/Terraform#2-vpc-peering)
+3. [NAT Gateway]()
+4. [Backend Block]()
+5. [Datasource Block]()
+6. [Terraform Import]()
+7. [RDS using Secret Manager]()
+8. [Provisioner in Terraform]()
 
 
 
@@ -115,4 +121,22 @@ resource "aws_vpc" "main"{
 ```
 We cannot edit the Resource Block and Resource Type, but we can change the Reference Name.
 
+
+
+## 3. NAT Gateway
+
+
+## 4. Backend Block
+
+
+## 5. Datasource Block
+
+
+## 6. Terraform Import
+
+
+## 7. RDS using Secret Manager
+
+
+## 8. Provisioner in Terraform
 
