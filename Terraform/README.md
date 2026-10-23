@@ -26,7 +26,7 @@ Both work under its own cloud only but Terraform works with all the clouds.
 
 Terraform is one of the IaaC (Infrastructure as a code), which can be used to create the infrastructures like resources VPC, EC2 Instances, Security Groups, Route Tables.
 
-- It supports multiple cloud providers [AWS, Azure, GCP]
+- It supports multiple cloud providers [AWS, Azure, GCP] and 200+ other cloud providers
 - It is idempotent [if you run same script, present infra will not change] as it holds state file.
 - We can plan the execution [`terraform plan`]
 - We can split configuration in multiple files
@@ -102,6 +102,7 @@ after/before this best part is create an IAM user, provide access to resources, 
 We usually hide the credentials in the .env file but as per the practice now
 
 `terraform plan`
+
 `terraform apply` > yes
 
 
@@ -110,17 +111,56 @@ We usually hide the credentials in the .env file but as per the practice now
 [Terraform code](https://github.com/106-Sam/DevOps/tree/main/Terraform/VPC-Peering)
 
 
+*Arguments* - Arguments are nothing but input values that we can add in the resource. For example, cidr_block = 10.0.0.0/16
+
+*Attributes* - Attributes are nothing but output values that we can get the return values. For example, for subnets vpc_id = aws_vpc.vpcA.id, where 'VPAA' is Reference Name.
+
+
+#### Provider Block
+
 ``` hcl
 
-#VPC Creation
+# Provider Block 
+provider "aws" {
+    region = "ap-south-2"
+    secret_key = ""
+    access_key = ""
+}
+```
+#### To create VPC resource
+
+``` hcl
 # Resource Block, Resource Type, Reference Name
-resource "aws_vpc" "main"{
+resource "aws_vpc" "VPCA"{
   cidr = "10.0.0.0/16"
+  tags = {
+    name = "VPC-main"
+    }
+}
+```
+We cannot edit the **Resource Block** and **Resource Type**, but we can change the **Reference Name**.
+
+> terrafrom validate
+> terrafrom plan
+
+We can use aws cli commands to list out the vpc like `aws ec2 describe-vpcs`
+
+> terraform apply --auto-approve 
+
+#### To create Subnet resource
+
+``` hcl 
+resource "aws_subnet" "sb-A"{
+  vpc_id = aws_vpc.VPCA.id     #resourcetype.referencename.<attributename>
+  cidr_block = "10.0.1.0/24"
+  tags = {
+    name = "sb-A"
+  }
 }
 
 ```
-We cannot edit the Resource Block and Resource Type, but we can change the Reference Name.
-
+To retrive the VPC ID, we need to use this format `resourcetype.referencename.<attributename>`
+ex: `aws_vpc.VPCA.id`
 
 
 ## 3. NAT Gateway
