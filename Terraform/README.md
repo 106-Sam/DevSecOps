@@ -111,10 +111,21 @@ We usually hide the credentials in the .env file but as per the practice now
 [Terraform code](https://github.com/106-Sam/DevOps/tree/main/Terraform/VPC-Peering)
 
 
+To perform VPC Peering we require below resources:
+1. Two or more VPC (in same/different region/availability zones)
+2. subnets (SB)
+3. internet gateways (IGW)
+4. default route tables (RT)
+5. default security groups (SG)
+6. VPC Peering & Accepter
+7. EC2
+
+
 *Arguments* - Arguments are nothing but input values that we can add in the resource. For example, cidr_block = 10.0.0.0/16
 
-*Attributes* - Attributes are nothing but output values that we can get the return values. For example, for subnets vpc_id = aws_vpc.vpcA.id, where 'VPAA' is Reference Name.
+*Attributes* - Attributes are nothing but output values that we can get the return values. For example, for subnets vpc_id = aws_vpc.vpcA.id, where 'VPCA' is Reference Name.
 
+we can write all the code in one file but to make things efficient and easier for troubleshooting.
 
 #### Provider Block
 
@@ -132,10 +143,18 @@ provider "aws" {
 ``` hcl
 # Resource Block, Resource Type, Reference Name
 resource "aws_vpc" "VPCA"{
-  cidr = "10.0.0.0/16"
+  cidr_block = "10.0.0.0/16"
   tags = {
-    name = "VPC-main"
+    name = "VPCA"
     }
+}
+
+#VPCB
+resource "aws_vpc" "VPCB"{
+  cidr_block = "192.168.0.0/16"
+  tags = {
+    Name = "VPCB"
+  }
 }
 ```
 We cannot edit the **Resource Block** and **Resource Type**, but we can change the **Reference Name**.
@@ -150,6 +169,8 @@ We can use aws cli commands to list out the vpc like `aws ec2 describe-vpcs`
 #### To create Subnet resource
 
 ``` hcl 
+
+# subnet A for VPC-A
 resource "aws_subnet" "sb-A"{
   vpc_id = aws_vpc.VPCA.id     #resourcetype.referencename.<attributename>
   cidr_block = "10.0.1.0/24"
@@ -158,9 +179,76 @@ resource "aws_subnet" "sb-A"{
   }
 }
 
+# subnet B for VPC-B
+resource "aws_subnet" "sb-B"{
+  vpc_id = aws_vpc.VPCB.id
+  cidr_block = "192.168.1.0/24"
+  tags = {
+    name = "sb-B"
+  }
+}
+
 ```
 To retrive the VPC ID, we need to use this format `resourcetype.referencename.<attributename>`
 ex: `aws_vpc.VPCA.id`
+
+**Interview Question: 
+How does terraform know that the vpc is already created or not?
+Ans) As terraform is idempotent, terraform knows that once the resource is created, as it hold the statefile (terraform.tfstate). And we create a resources the terraform will create and have all the vpc information along with (present infrastructre information is mentioned in the statefile). It will always verfify the state file if it available or not.**
+
+
+_Note:_ If resource type is same then the reference name must be unqiue.
+
+#### TO create Internet Gateway
+
+``` hcl 
+# IGW-A for VPC_A 
+resource "internet_gateway" "IGWA"{
+  vpc_id = aws_vpc.VPCA.id
+  tags = {
+    Name = "IGWA"
+  } 
+}
+
+# IGW-A for VPC-B
+resource "internet_gateway" "IGWB"{
+  vpc_id = aws_vpc.VPCB.id
+  tags = {
+    Name = "IGWB"
+  }
+
+}
+```
+ 
+#### To create/manage default route tables 
+
+``` hcl
+
+resource "aws_default_route_table" "RT-A"{
+    default_route_table_id = aws_vpc.VPCA.default_route_table_id
+
+    route{
+      cidr_block = "10.0.1.0/24"
+      gateway_id = internet_gatway.id
+    }
+    tags = {
+      Name = "RT-A"
+    }
+}
+
+resource "aws_default_route_table" "RT-B"{
+  default_route_table_id = aws_vpc.VPCB.default_route_table_id
+
+  route{
+    cidr_block = "192.168.1.0/24"
+    gateway_id = internet_gateway.id
+  }
+  tags = {
+    Name = "RT-B"
+  }
+}
+
+```
 
 
 ## 3. NAT Gateway
