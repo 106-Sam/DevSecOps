@@ -5,6 +5,7 @@
 1. [Day 1 - Version Control System in Git](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-1---version-control-system-in-git)
 2. [Day 2 - Merge Conflicts and Branching Strategies](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-2---merge-conflicts-and-branching-strategies)
 3. [Day 3 - Git Merge, Square, Rebase, Cherry-Pick Undo](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-3---git-merge-squash-rebase-cherrypick-undo-rollback-reset-revert)
+4. [Day 4 - Git Pull, Fetch](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-4---git-pull-fetch)
 
 
 
@@ -396,10 +397,57 @@ git reset --mixed HEAD~1  # removes the previous commit and moves to working are
  - Revert is used to rollback from pushed code (GITHUB repo) to a specific commit history 
  - it adds Revert commit to the commit history
 
-`git revert <commit-id>` # to revert to that particular git commit version \
+`git revert <commit-id>` # to revert to that particular git commit version 
 `git push`
 
 ![alt text](files/image3.png)
 
 ![alt text](files/image4.png)
 
+
+
+
+## Day 4 - Git Pull Fetch 
+
+### Git Pull
+
+**git pull** - We use `git pull`, to update the local code with the updated code from the repository.
+
+`git pull` = `git fetch` + `git merge`
+
+
+### Git Fetch
+
+**git fetch** - We use `git fetch`, to show the updated code from the repository but it will not update the local code. It will just download the updated code and store it in a separate branch called **FETCH_HEAD**. And then we need to do `git merge` if the changes looks good or promising.
+
+
+### Git ignore file (.gitignore)
+
+**.gitignore** - If we want to exclude any file, we are going to write those file names in .gitignore file.
+
+``` text
+
+*.py
+*.txt
+*.tfstate
+
+```
+
+### Git Stash
+
+**git stash** - We use `git stash` to temporary pause the working area (it might be untracked file/tracked file). `git stash -u` -u  means untracked files 
+
+**git stash pop** - We use `git stash pop` to resume the working area. ()
+
+**git stash list** - We use `git stash list` to list out all the stashed files/changes with indexes
+
+**git stash drop** - We use `git stash drop` to delete all the stashed files/changes. `git stash drop stash@{1}` - it has index.
+
+``` bash
+
+touch sam.txt
+git status # it has untracked file named "sam.txt"
+git stash -u 
+git status # working tree clean
+
+```
