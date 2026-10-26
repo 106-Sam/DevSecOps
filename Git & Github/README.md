@@ -466,3 +466,6 @@ _Note:_
 
 diff between two branches
 
+`git diff gitbranch main` - TO diff the changes from two branches 
+
+
