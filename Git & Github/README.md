@@ -152,6 +152,7 @@ and then we need to raise a PR.
 
 In git merge, we have 4 types of merge:
 - Merge (standard)
+- fast forward merge
 - Squash Merge
 - Rebase merge
 - Cherry-Pick Merge
@@ -190,6 +191,13 @@ git merge devbranch
 exit the file or write message and exit
 git log --oneline # 6 commits includes 1 merge commit
 #this provides us all the commits of devbranch as well
+```
+
+- **fast-forward Merge** - When we *fast-forward merge* there is no new commit in the `x` branch it is same as `main/master` branch.
+
+```
+git checkout main
+git merge feature-branch
 ```
 
 
@@ -468,4 +476,12 @@ diff between two branches
 
 `git diff gitbranch main` - TO diff the changes from two branches 
 
+### git rebase -i --edit-todo
 
+
+`git rebase -i HEAD~3`  or `git rebase --edit-todo` 
+
+- HEAD~3 - means top 3 commits latest 
+- it will help us edit/change the commit message 
+- pick to rewords and give the commit message 
+- if it is a latest commit just use `git commit --amend`
