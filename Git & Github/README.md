@@ -5,7 +5,7 @@
 1. [Day 1 - Version Control System in Git](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-1---version-control-system-in-git)
 2. [Day 2 - Merge Conflicts and Branching Strategies](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-2---merge-conflicts-and-branching-strategies)
 3. [Day 3 - Git Merge, Square, Rebase, Cherry-Pick Undo](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-3---git-merge-squash-rebase-cherrypick-undo-rollback-reset-revert)
-4. [Day 4 - Git Pull, Fetch](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-4---git-pull-fetch)
+4. [Day 4 - Git Pull, Fetch](https://github.com/106-Sam/DevSecOps/tree/main/Git%20%26%20Github#day-4---git-pull-fetch-stash)
 
 
 
@@ -104,7 +104,7 @@ Step 4: It will prompt auth during `git push` choose token > paste the token and
 
 ### Merge Conflicts 
 
-Merge conflicts often happen when people make different changes to the same line of the same file, or when one person edits a file and another person deletes the same file.
+Merge conflicts often happen when people make different changes to the same line of the same file, or when one person edits a file and another person deletes the same file. (we get conflict when we `git pull`)
 
 [click here](https://docs.github.com/en/pull-requests/reference/merge-conflicts)
 
@@ -407,7 +407,11 @@ git reset --mixed HEAD~1  # removes the previous commit and moves to working are
 
 
 
-## Day 4 - Git Pull Fetch 
+## Day 4 - Git Pull Clone Fetch Stash Diff
+
+### Git clone
+
+**git clone** - We use `git clone`, to download the already existing repository to the local
 
 ### Git Pull
 
@@ -451,3 +455,14 @@ git stash -u
 git status # working tree clean
 
 ```
+
+
+_Note:_ 
+- We use Token (PAT) for git authentication in the windows operating system.
+- We use ssh-keys for the linux operating system.
+
+
+### Git diff
+
+diff between two branches
+
