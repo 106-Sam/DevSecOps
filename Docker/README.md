@@ -45,7 +45,7 @@ SOA - Service oriented Architecture
 
 Docker Registory - [hub.docker.com](hub.docker.com)
 
-### Installation of Dokcer 
+### Installation of Docker 
 
 `apt install docker.io`
 
@@ -127,7 +127,7 @@ To run an container in detach mode without exiting
 - In that scenario we use `docker attach --detach-keys="ctrl-z" <contName/ID>` it takes us to container cli but instead of typing exit we need to press `ctrl+z` button to get out of it without killing the container.
 
 
-### networks
+### Networks
 
 - `docker network ls` - To list out the docker host networks
 
