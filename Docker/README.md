@@ -48,6 +48,13 @@ Docker Registory - [hub.docker.com](hub.docker.com)
 
 `apt install docker.io`
 
+#### to run docker without sudo by adding user to docker group
+
+``` bash
+sudo usermod -aG docker $USER
+newgrp docker 
+```
+
 - `docker info` - it displays the information about the docker hosts
 - `docker images` - to list all the images that are present locally on the system
 - `docker ps` - to list out the running containers ()
@@ -83,7 +90,7 @@ Docker Image is immutable, we can't change anything in an image, image doesn't h
 - `docker create <imageName>` - To create a container
 - `docker create --name <customName> <imageName>` - To create a container with custom name
 - `docker create --name <customName> -it <imageName>` - To create ubuntu or operating system related image in interactive mode for /bin/bash 
-- `docker attach <contName>` - To attach or login into the container like operating system
+- `docker attach <contName>` - To attach into the container like operating system but when we exit the contianer also exits 
 - `docker run <contName/ImageName>` - run command is a combination of [pull, create, start, attach/detach, stop] docker cli.
 
 - `docker rm <contID/contName` - To delete a container
@@ -103,3 +110,72 @@ To run an container in detach mode without exiting
 
 
 ## Day 3 - Docker Networks
+
+- `docker events` - it displays all the events occured in the backend in docker cli.
+- `docker top <contName/ID>` - it displays information related to PPID (processIDs) etc.
+- `docker exec -it <contName/ID>` - it login to the container via shell 
+
+
+#### Difference between attach and exec docker command
+
+- when we use `docker attach` command the docker container gets killed when we exit.
+- whereas in `docker exec` command the docker container still runs even after we exit.
+
+#### Requirement in interview if asked we need to use attach command only but when I exit the container must not be killed
+
+- In that scenario we use `docker attach --detach-keys="ctrl-z" <contName/ID>` it takes us to container cli but instead of typing exit we need to press `ctrl+z` button to get out of it without killing the container.
+
+
+### networks
+
+- `docker network ls` - To list out the docker host networks
+
+We can see the bridge, host and none networks over there, all the containers by default are created in the bridge network.
+
+- `docker inspect network bridge` - to inspect the bridge network
+
+it shows the subnets cidr range /16 
+
+#### To check if the two docker container are able to communicate with each other or not.
+
+- by default, `ping` command isn't present as many package are removed to reduce the size of the image.
+- hence, we need to install the packages for the command.
+- `docker run --dit cont1 ubuntu`
+- `docker run --dit cont2 ubutnu`
+- `docker exec -it cont1 /bin/bash` > `apt update` > `apt install iputils-ping -y`
+- `docker exec -it cont2 /bin/bash` > ...
+- `docker inspect network bridge` > ping x.x.x.x 
+
+_Note_: Here, we have noticed that we are able to communicate with ip address but not with the container name
+
+
+#### To create own network bridge
+
+- `docker network create <bridgeName>` - To create the our own bridge network
+
+#### To create docker image in the custom bridge
+
+`docker run -dit --name cont1 --network=<bridgeName> ubuntu`
+
+_Note:_ Now, we are able to communicate with the ip address and also the container name.
+
+> In default network, the dhcp isn't resolved but in the custom bridge network dhcp is resolved
+
+#### Container Port mapping to Host ports
+
+`docker run -d -p8080:80 --name cont1 nginx`
+`docker run -d -p8081:80 --name cont2 httpd`
+
+we can access the nginx/httpd server via public ip with the specified ports.
+
+#### Host Network
+
+`docker run -d -p8080:80 --name cont1 --network=host nginx`
+
+*Note: While using host network we can't map the ports to external ports. Hence we can't run two container using same internal ports* 
+
+We can connect to it by using our Host IP address with the default port
+
+- We use `host network` for the database related containers and it doesn't have ip address
+- we use `bridge network` for the applications related containers
+- we use `none network` if we doesn't need any networks for the containers.
