@@ -4,6 +4,8 @@ Index of Content
 
 1. [Day 1 - Docker Introduction](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-1---docker-introduction)
 2. [Day 2 - Container Operations](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-2---container-operations)
+3. [Day 3 - Docker Networks](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-2---docker-networks)
+
 
 
 ## Day 1 - Docker Introduction 
@@ -66,3 +68,38 @@ Docker runs windows image if using windows machne as a host.
 
 
 ## Day 2 - Container Operations
+
+The difference between `locate` and `find` command 
+- `find` command goes into all the path in the system and searches for it.
+- `locate` command update the new file or directory in the cache and finds it quickly.
+
+Whenever, we inspect a docker image using `docker inspect image <containerName>` we will see `cmd` path which is run by default when we start/execute the images.
+
+
+#### What is image?
+
+Docker Image is immutable, we can't change anything in an image, image doesn't have any runtime where as container has a runtime and which can be accessible outside and is similar to a Virtual Machine (VM)
+
+- `docker create <imageName>` - To create a container
+- `docker create --name <customName> <imageName>` - To create a container with custom name
+- `docker create --name <customName> -it <imageName>` - To create ubuntu or operating system related image in interactive mode for /bin/bash 
+- `docker attach <contName>` - To attach or login into the container like operating system
+- `docker run <contName/ImageName>` - run command is a combination of [pull, create, start, attach/detach, stop] docker cli.
+
+- `docker rm <contID/contName` - To delete a container
+- `docker rm -f <contID/contName> ` - To stop and delete the container at once (normally force 
+delete)
+- `docker rmi <imageName>` - To delete the docker images
+  
+- `docker ps` - this command is to list out the running containers
+- `docker ps -a` - this command is to list out all the running/stopped/created (any state) containers
+  
+- `docker start <contID/contName>` - TO start a container 
+- `docker stop <contID/contName>` - TO stop a container 
+
+
+To run an container in detach mode without exiting 
+`docker run -d -it --name ubuntu111 ubuntu`
+
+
+## Day 3 - Docker Networks
