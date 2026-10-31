@@ -4,7 +4,7 @@ Index of Content
 
 1. [Day 1 - Docker Introduction](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-1---docker-introduction)
 2. [Day 2 - Container Operations](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-2---container-operations)
-3. [Day 3 - Docker Networks](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-2---docker-networks)
+3. [Day 3 - Docker Networks](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-3---docker-networks)
 
 
 
