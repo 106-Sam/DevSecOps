@@ -160,7 +160,7 @@ _Note_: Here, we have noticed that we are able to communicate with ip address bu
 
 _Note:_ Now, we are able to communicate with the ip address and also the container name.
 
-> In default network, the dhcp isn't resolved but in the custom bridge network dhcp is resolved
+> In default network, the name isn't resolve but in the custom bridge network name is resolved
 
 #### Container Port mapping to Host ports
 
