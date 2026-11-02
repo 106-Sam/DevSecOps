@@ -231,6 +231,9 @@ resource "aws_default_route_table" "RT-A"{
       cidr_block = "10.0.1.0/24"
       gateway_id = internet_gatway.id
     }
+    route{
+        cidr_block = var.subnetA_cidr
+        vpc_peering_connection_id = aws_vpc_peering_connection.VPCA-VPCB.id
     tags = {
       Name = "RT-A"
     }
@@ -243,6 +246,9 @@ resource "aws_default_route_table" "RT-B"{
     cidr_block = "192.168.1.0/24"
     gateway_id = internet_gateway.id
   }
+  route{
+        cidr_block = var.subnetA_cidr
+        vpc_peering_connection_id = aws_vpc_peering_connection.VPCA-VPCB.id
   tags = {
     Name = "RT-B"
   }
@@ -256,23 +262,103 @@ resource "aws_default_security_group" "SG-A"{
   vpc_id = aws_vpc.VPCA.id
 
   ingress {
-    protocol = -1
+    protocol = "tcp"
     self = true
-    from_port = 0
-    to_port = 0
+    from_port = 22
+    to_port = 22
+    cidr_block = [0.0.0.0/0]
   }
-  
+  ingress{
+    protocol = "icmp"
+    self = true
+    from_port = -1
+    to_port = -1
+    cidr_block = [192.168.1.0/24]
+  }
   egress {
     portocol = -1
     self = true
-    from_port = 0
-    to_port = 0
+    from_port = -1
+    to_port = -1
+    cidr_block = [192.168.1.0/24]
+  }
+  tags = {
+    Name = SG-A
   }
 }
 
+resource "aws_default_security-group" "SG-B"{
+  vpc_id = aws_vpc.VPCB.id
+
+  ingress {
+    protocol = "tcp"
+    self = true
+    from_port = 22
+    to_port = 22
+    cidr_block = [0.0.0.0/0]
+  }
+  ingress{
+    protocol = "icmp"
+    self = true
+    from_port = -1
+    to_port = -1
+    cidr_block = [10.0.1.0/24]
+  }
+  egress {
+    portocol = -1
+    self = true
+    from_port = -1
+    to_port = -1
+    cidr_block = [10.0.1.0/24]
+  }
+  tags = {
+    Name = "SG-B"
+  }
+}
 
 ```
 
+#### To create vpc peering  connection with autoaccepter
+``` hcl
+resource "aws_vpc_peering_connection" "VPCA-VPCB" {
+  peer_vpc_id   = aws_vpc.VPCB.id
+  vpc_id        = aws_vpc.VPCA.id
+  auto_accept   = true
+
+  tags = {
+    Name = "VPCA-VPCB"
+  }
+}
+```
+
+#### To create EC2 Instance 
+```hcl 
+resource "aws_instance" "Server-A" {
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  subnet_id     = aws_subnet.subnetA.id
+  key_name      = var.key_name
+  vpc_security_group_ids = [aws_default_security_group.default-sg-A.id]
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "Server-A"
+  }
+}
+resource "aws_instance" "Server-B" {
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  subnet_id     = aws_subnet.subnetB.id
+  key_name      = var.key_name
+  vpc_security_group_ids = [aws_default_security_group.default-sg-B.id]
+  associate_public_ip_address = true
+
+
+  tags = {
+    Name = "Server-B"
+  }
+}
+```
 
 ## 3. NAT Gateway
 
