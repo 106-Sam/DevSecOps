@@ -184,3 +184,98 @@ We can connect to it by using our Host IP address with the default port
 
 
 ## Day 4 - Docker Volume and Image Creation
+
+Docker, we use only for orchestration and we don't usually use docker instead we use kubernetes which internally uses docker as a pod.
+
+Drawbacks of Docker are:
+- No High availability
+- No load balancer
+- No Auto Scaling 
+
+So dockers main purpose is to create images.
+
+### Docker Volumes
+
+Actual requirement of the volume is that incase, the container crashes the imp data is lost...Hence we attach volumes so we can reattach it and have the data available for us.  (For persistent data)
+
+Even if we stop the container the data is lost
+
+
+`docker volume ls` - to list out the volumes
+
+- We add multiple container to the same volume
+
+`docker volume create <volumeName>` - To create a volume
+ 
+
+`docker inspect <volumeName>` - To know the exact path where it is getting stored.
+
+by default linux systempath - /var/lib/docker/volumes/sam/_data
+
+### Volume Mount
+
+WE can mount volumes in 3 ways:
+
+1. --mount
+
+`docker run -dit --name cont1 --mount source=<existingvolumeName>,target=<contdirectoryName> ubuntu`
+
+the data is safe only if the data was create or moved to /<contdirectoryName>
+
+2. -v
+
+`docker run -dit --name cont1 -v <existingVolumeName>:<contDirectoryName> ubuntu`
+
+3. --volumes-from
+
+`docker run -dit --name cont2 --volumes-from cont1 ubuntu`
+
+
+---
+
+### Attach PWD to container 
+
+`docker run -dit --name cont1 -v "$(pwd)":/data ubuntu`
+
+
+### Image Creation
+
+Instruction:
+
+1.First, we require a base image and using the base image we will create a container. [base image]
+2. Secongly, I will install `iputils-ping` package for `ping` command [ping command]
+3. AFter that, I will convert this container into image again. [base image + ping command]
+4. Push the image to  hub.docker.com
+
+``` bash
+
+docker run -it --name cont1 ubuntu
+
+   cont1# apt update
+   cont1# apt install iputils-ping -y
+   exit
+
+docker image inspect ubuntu (one layer is add total 2)
+
+docker exec -it cont1 /bin/bash
+
+docker commit cont1 samIMG
+docker iamges
+
+- create your account in hub.docker.com and auth 
+
+docker login -u <username> 
+or 
+docker login (web based login and paste the code from terminal)
+
+- and make sure when you push the image <username>/<newImage>
+
+docker tag abdulsami106/samIMG:latest  
+docker images
+docker push abdulsami106/samIMG:latest
+```
+
+
+### docker commit
+
+![alt text](files/image1.png)
