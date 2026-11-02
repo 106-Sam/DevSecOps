@@ -128,7 +128,6 @@ To perform VPC Peering we require below resources:
 we can write all the code in one file but to make things efficient and easier for troubleshooting.
 
 #### Provider Block
-
 ``` hcl
 
 # Provider Block 
@@ -138,6 +137,7 @@ provider "aws" {
     access_key = ""
 }
 ```
+
 #### To create VPC resource
 
 ``` hcl
@@ -247,6 +247,29 @@ resource "aws_default_route_table" "RT-B"{
     Name = "RT-B"
   }
 }
+```
+#### To create/manage default security group
+
+``` hcl 
+
+resource "aws_default_security_group" "SG-A"{
+  vpc_id = aws_vpc.VPCA.id
+
+  ingress {
+    protocol = -1
+    self = true
+    from_port = 0
+    to_port = 0
+  }
+  
+  egress {
+    portocol = -1
+    self = true
+    from_port = 0
+    to_port = 0
+  }
+}
+
 
 ```
 
