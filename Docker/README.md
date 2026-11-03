@@ -6,7 +6,7 @@ Index of Content
 2. [Day 2 - Container Operations](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-2---container-operations)
 3. [Day 3 - Docker Networks](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-3---docker-networks)
 4. [Day 4 - Docker Volume and Image Creation](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-4---docker-volume-and-image-creation)
-5. [Day 5 - ]
+5. [Day 5 - Multi Stage Dockerfile](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-5---multi-stage-dockerfile)
 
 
 
@@ -279,3 +279,33 @@ docker push abdulsami106/samIMG:latest
 ### docker commit
 
 ![alt text](files/image1.png)
+
+## Day 5 - Multi Stage Dockerfile
+
+Whatever Image it might be or wherever it might be of it is created by using dockerfile.
+
+Dockerfile - It is a plain text file which we are going to write the instructions.
+
+Dockerfile must be saved as "Dockerfile" it is case sensitive.
+
+#### **Docker Instructions:**
+
+`FROM`  => Base Image
+`RUN`  => to execute command, software
+`COPY` =>  purpose is to copy files from DockerHost to Image
+`ADD` =>   purpose is to copy files from DockerHost to Image
+`WORDIRD` => to change directory path
+`CMD` => Final Execution (if we run our image it by default runs these)
+`ENTRYPOINT` => Final Execution ()
+`EXPOSE` => application might run on which port [Documentation Purpose only]
+`HEALTHCHECK` => it check the health of our image
+`ONBUILD` => Save it for later.
+`ENV` => to define the environment variables
+`ARGS` => version
+
+
+
+> We don't hae to write/use all the instructions we only need to use the once that are needed.
+
+
+80% times we only have to write the dockerfiles.
