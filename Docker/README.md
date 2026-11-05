@@ -7,7 +7,7 @@ Index of Content
 3. [Day 3 - Docker Networks](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-3---docker-networks)
 4. [Day 4 - Docker Volume and Image Creation](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-4---docker-volume-and-image-creation)
 5. [Day 5 - Multi Stage Dockerfile](https://github.com/106-Sam/DevSecOps/tree/dockerbranch/Docker#day-5---multi-stage-dockerfile)
-
+6. [Day 6 - ]
 
 
 ## Day 1 - Docker Introduction 
@@ -292,8 +292,8 @@ Dockerfile must be saved as "Dockerfile" it is case sensitive.
 
 `FROM`  => Base Image
 `RUN`  => to execute command, software
-`COPY` =>  purpose is to copy files from DockerHost to Image
-`ADD` =>   purpose is to copy files from DockerHost to Image
+`COPY` =>  purpose is to copy files from DockerHost to Image (It will just copy the files as it is )
+`ADD` =>   purpose is to copy files from DockerHost to Image (It will extract the .gz .zip file from the DH to Image/Container. Even download the zip files from link but doesn't extract it)
 `WORDIRD` => to change directory path
 `CMD` => Final Execution (if we run our image it by default runs these)
 `ENTRYPOINT` => Final Execution ()
@@ -301,7 +301,7 @@ Dockerfile must be saved as "Dockerfile" it is case sensitive.
 `HEALTHCHECK` => it check the health of our image
 `ONBUILD` => Save it for later.
 `ENV` => to define the environment variables
-`ARGS` => version
+`ARGS` => version 
 
 
 
@@ -309,3 +309,10 @@ Dockerfile must be saved as "Dockerfile" it is case sensitive.
 
 
 80% times we only have to write the dockerfiles.
+
+- The code developed by the developer should be converted into an Image.
+- So, whenever you use this Image to convert into a container automatically the application should start running.
+- And we can use this image in any environment like stage, uat, prod
+
+
+## Day 6 - COPY and ADD in Docker
