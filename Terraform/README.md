@@ -624,7 +624,53 @@ output "subnet_ids" {
   value = data.aws_subnets.existingSub.ids
 }
 ```
+#### Import state file to prevent data blocks
 
+- First, Infra Team will create all the resource (VPC, SG, RT, IGW...etc) let suppose the team is using remote location like S3 bucket using backend block.
+- Operation team can import it using data block.
+
+
+filename: provider.tf
+```hcl 
+# Configure Provider
+provider "aws" {
+    region = "ap-south-2"
+    access_key =  var.accesskey
+    secret_key = var.secretkey
+}
+
+data "terraform_remote_state" "networks"{
+  backend = "s3"
+
+  config = {
+    bucket = "<bucketName>"
+    key = "prod.tfstate" # Must match the exact key from Project A
+    region = "ap-south-2"
+
+  }
+}
+```
+`terraform init`
+
+- Copy the AMI ID from EC2 instance
+
+filename: ec2.tf
+
+```hcl 
+resource "aws_instance" "Server-A"{
+  ami = "ami-xxxxxx"
+  instance_type = "t3.micro"
+  key_name = "<existingKeysName>"
+  subnet_id = data.terraform_remote_state.network.outputs.subnet_id
+  associate_public_ip_address = true
+  
+  # vpc_security_group_ids = [data.terraform_remote_state.network.outputs.default_security_group_id]
+
+  tags = {
+    Name = "Server_A"
+  }
+}
+```
 
 ## 6. Terraform Import
 
