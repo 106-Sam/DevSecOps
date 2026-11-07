@@ -48,6 +48,7 @@ Terraform is one of the IaaC (Infrastructure as a code), which can be used to cr
 - `terraform validate`: it will validate code syntax
 - `terraform plan`: it will show execution plan
 - `terraform apply`: it will create all resources
+- `terraform apply --auto-approve`: it will auto approve and create all the resource
 - `terraform destory`: it will destory all resources
 - `terraform fmt`: it will indent/format our code
 
@@ -107,6 +108,7 @@ We usually hide the credentials in the .env file but as per the practice now
 
 
 ## 2. VPC Peering
+
 
 [Terraform code](https://github.com/106-Sam/DevOps/tree/main/Terraform/VPC-Peering)
 
@@ -362,11 +364,266 @@ resource "aws_instance" "Server-B" {
 
 ## 3. NAT Gateway
 
+if terraform .tfstate file is deleted, as a DevOps Engineer, we can't manage the terraform created infrastructure.
+
+### Terraform basics1
+
+#### Terraform Variable
+Whenever we use/define the variable like `var.ipaddress` or `var.ipvpca` , we need to declare a variable block as well.
+
+- There are many way to use variables:
+
+1. Use variable block and providing the variable value in it.
+
+``` hcl 
+
+# Define Variable 
+resource "aws_vpc" "VPCA"{
+  cidr_block = var.ipvpca
+}
+```
+filename : variable.tf
+
+``` hcl 
+#declare variable
+variable "ipvpca"{
+  default = "10.0.0.0/16"
+}
+```
+
+2. using `terraform.tfvars` file  which is default .tfvar filename and terraform picks the variable value from the `.tfvars` files first which might override the `variable.tf` declarations
+
+filename: terraform.tfvars
+```hcl 
+ipvpca = "10.1.0.0/16"
+}
+```
+
+SO, the best way is to use the `.tfvars` file and update the `variable.tf` file.-
+
+filename: variable.tf
+```hcl 
+
+variable "ipvpca" {}
+```
+
+3. In case, you don't like to use default name `terraform.tfvars` or created with different name we need explicitly provide it as an ARGument point out thvariable "ipvpca"{
+  default = "10.0.0.0/16"at file `.tfvars` file we don't then it will prompt us for value while `terraform plan` or `terraform apply --auto-approve`
+
+> terraform plan/apply --var-file <fileNamewithPATH>
+`terraform plan/apply --var-file <fileNamewithPATH>`.
+
+#### Terraform State file CLI
+
+- In case, if you changed the reference name after creating the resource, the terraform thinks its new configuration and old configuration gets deleted.
+- We need to rename that reference name in the statefile via CLI (recommended)
+
+`terraform state list` - it will read the statefile and list us the resources
+
+`terraform state` - it will display the help menu
+
+`terraform state mv aws_vpc.VPCA aws_vpc.VPCB` - It will rename the reference name for VPCA with VPCB. `terraform state mv <previousRefname> <newRefName`
+
+To perform NAT GATWAY we require below resources/Steps in order:
+1.  
+
 
 ## 4. Backend Block
 
+### Terraform basics2
 
-## 5. Datasource Block
+#### Terraform Backend
+
+What is backend block ?
+To store our statefile in the S3 bucket
+
+
+``` hcl
+resource "aws_s3_bucket" "example" {
+  bucket = "<unique_name_for_bucket>"
+  tags = {
+    Name = "<unique_name_for_bucket>"
+  }
+}
+```
+
+Now I want to store the .tfstate file in the s3 bucket and not local machine for that we use backend block
+
+filename: Provider.tf
+
+```hcl 
+# Configure Provider
+provider "aws" {
+    region = "ap-south-2"
+    access_key =  var.accesskey
+    secret_key = var.secretkey
+}
+
+teraform{
+  backend "s3" {
+    bucket = "<unique_name_for_bucket>"
+    key = "<filename>.tfstate"
+    region = "ap-south-2
+  }
+}
+
+```
+
+Here backend block doesn't take the credentials from the Provider block it takes it from the aws cli authentication in the terminal.
+
+`aws configure` - add the access_keys and secret_keys 
+
+After setup do again `terraform init` 
+
+#### Terraform Destroy must not delete the state file
+
+if we try to do `terraform destory` we will lose the .tfstate file. 
+
+however, s3 doesn't get deleted as the s3 bucket isn't empty only the empty buckets get deleted.
+
+Therefore, we will remove the s3 bucket details from the statefile via `terraform state` commands 
+
+`terraform state list` - to list all the resources
+`terraform state` - to get the help menu for cli
+`terraform state rm aws_s3_bucket.<bucketReferenceName>` - to delete the s3 bucket from state file
+`terraform state list` - s3 bucket will not be listed now.
+
+#### Terraform Destory 
+
+- we can destroy the resource by just remove the code from the .tf files 
+- we can also destory it by using below way for specific resource 
+
+`terraform state list` 
+`terraform destory -target aws_subnet.<subnetReferenceName>`  - to destory a specific resource from statefile and also resource
+
+#### Storing statefile in the centralized location 
+
+- it helps multiple users work on the same project in the terraform 
+
+#### Output block 
+
+We use output block to print out the value. We require after the resource are created and running
+
+example:
+
+```hcl 
+
+output "ServerA_Public_IP" {
+  value = aws_instance.Server-A.public_ip
+}
+output "ServerA_Private_IP"{
+    value = aws_instance.Server-A.private_ip
+}
+output "ServerB_Public_IP" {
+  value = aws_instance.Server-B.public_ip
+}
+output "ServerB_Private_IP"{
+    value = aws_instance.Server-B.private_ip
+}
+output "vpc_id"{
+  value = aws_vpc.my_vpc.id
+}
+
+```
+
+We get output only when after we do `terraform apply` as only then the resource are created.
+
+#### Terraform Console cli 
+
+We use `terraform console` command to check if the variable we declared in the terraform code are getting what inputs.
+
+`terraform console`
+> `var.vpc-name
+
+#### Depends_on block Terraform
+
+- Terraform doesn't know about the sequence, so it created the resources randomly. Hence, we can use `depends_on` block to get it sequencely
+
+one of the meta argument is "depends_on" 
+
+We use `depends_on` to execute the terraform code in the sequentical order we use depends on.
+
+example:
+
+```hcl 
+
+resource "aws_vpc" "VPCA"{
+    cidr_block= var.vpca_cidr
+    tags = {
+        Name = "VPCA"
+    }
+}
+
+resource "aws_subnet" "subnetA"{
+    vpc_id = aws_vpc.VPCA.id
+    cidr_block = var.subnetA_cidr
+    availability_zone = var.region
+    tags = {
+        Name = "subnetA"
+    }
+    depends_on = [aws_vpc.VPCA]
+}
+resource "aws_internet_gateway" "igwA" {
+    vpc_id = aws_vpc.VPCA.id
+    tags = {
+        Name = "igwA"
+    }
+    depends_on = [aws_vpc.VPCA]
+}
+
+```
+
+## 5. Datasource & Import Block
+
+We use `data block` to read any existing resources
+
+Examples:
+
+```hcl 
+
+data "aws_vpc" "existingVPC1"{
+  id = "vpc-xxxxx"
+}
+```
+
+Now to test if this VPC really exists we use output block to verify:
+
+```hcl
+output "vpc_id" {
+  value = data.aws_vpc.existingVPC1.id
+}
+
+```
+IF same vpc id is printed means it is working.
+
+To know cidr_block and etc use the same output block to list out what is the cidr range for that VPC.
+
+```hcl 
+output "cidr_id"{
+  value = data.aws_vpc.exitingVPC1.cidr_block
+}
+```
+
+#### To list out the existing Subnet ID in a given VPC ID
+
+```hcl
+
+data "aws_subnets" "exisitngSub"{
+  filter{
+    name = "vpc-id"
+    value = [var.vpc_id]
+  }
+}
+
+variable "vpc_id"{
+  type = string
+  default = "vpc-xxxxx"
+}
+
+output "subnet_ids" {
+  value = data.aws_subnets.existingSub.ids
+}
+```
 
 
 ## 6. Terraform Import
