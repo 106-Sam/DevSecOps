@@ -674,8 +674,233 @@ resource "aws_instance" "Server-A"{
 
 ## 6. Terraform Import
 
+In Companies, we only use Terraform Modules.
+
+
+#### To manage existing resource in AWS, have to import resources into Terraform:
+
+1. You need to create resource block
+2. Import ID to this block (resourceType.resourceName)
+   
+`terraform import aws_vpc.name vpc-xxxxxxxxx` - to import the resource from AWS.
+`terraform state list`
+
+_Note:_ When we use `terraform destory -auto-approve` it will also delete the manually created resource and the one we have imported into terraform.
+
+
+```hcl 
+resource "aws_vpc" "name"{
+  cidr_block = "10.0.0.0/16" # value from the AWS VPC 
+}
+
+```
+#### Workspace
+
+![alt text](files/image.png)
+
+We don't need to create the same code for the DEV, UAT, PROD etc just need to have one code and different `uat.tfvars` & `prod.tfvars` files for different variable inputs.
+
+filename: vpc.tf
+
+```hcl 
+resource "aws_vpc" "name"{
+  cidr_block = var.vpc_cidr_block 
+  tags = {
+    Name = var.vpc-name
+  }
+}
+
+```
+
+filename: variable.tf
+
+```hcl
+variable "vpc_cidr_block" {}
+variable "vpc-name" {}
+```
+
+
+filename: dev.tfvars
+
+```hcl
+vpc_cidr_block = "10.0.0.0/16"
+vpc-name = "dev-vpc"
+```
+
+filename: prod.tfvars
+
+```hcl
+vpc_cidr_block = "10.1.0.0/16"
+vpc-name = "prod-vpc"
+```
+
+`terraform plan --var-file prod.tfvars` 
+`terraform apply --var-file prod.tfvars -auto-approve`
+
+- The advantage of workspace is that we can use two different statefile for different environment.
+
+`terraform workspace` - To print out the help menu
+`terraform workspace list` - to display the list of workspaces. (by default, we have "default" workspace)
+`terraform workspace show` - to display the space we are currently working in.
+`terraform new <workspaceName>` - to create new workspace.
+`terraform select <workspaceName>` - to select a workspace
+
+
+```bash
+terraform apply --var-file dev-tfvars
+terraform workspace list 
+terraform workspace select prod-env
+terraform apply --var-file prod.tfvars
+
+```
+
+Same way the statefiles are created if we are using the backend block to S3 bucket.
+
+#### Modules
+
+For example, In Dev.env, I want to create `lb.tf` or in the Prod-env, I want to remove IGW and add S3.tf and rds.tf
+
+- We use `modules` for the reusablility.
+
+![alt text](files/image1.png)
+
+
+Infra_Module/VPC_Module/
+filename: vpc.tf
+
+```hcl 
+resource "aws_vpc" "vpcA"{
+  cidr_block = var.VPCA-CIDR
+
+  tags = {
+    Name = "VPC-A"
+  }
+}
+
+resource "aws_subnet" "subnet"{
+  vpc_id = aws_vpc.vpcA.id
+  cidr_block = var.subAIP
+  tags = {
+    Name = "SubA"
+  }
+}
+```
+
+filename: Dev-Env/provider.tf
+```hcl
+provider "aws"{
+  access_key = ""
+  secret_key = ""
+  region = "ap-south-2"
+}
+
+module "vpc" {
+  source = ./Infra_Module/VPC_Module
+  VPCA-CIDR = 10.0.0.0/16
+  subAIP = 10.0.1.0/24
+}
+```
+![alt text](files/image2.png)
+
+- We shouldn't provide the value in the raw code(infra_modules etc.)
+- As the codes are in the different folder in the Modules. We can't call the ID's from `ReferenceType.ReferenceName` like `vpc_id = aws_vpc.VPCA.id`
+- We can call it via the output block for example:
+```hcl 
+#filename: IGW_modules/igw.tf
+resource "internet_gateway" "IGWA"{
+  vpc_id = var.vpc_id
+}
+
+
+#filename: IGW_modules/variable.tf
+variable "vpc_id" {}
+
+
+#filename: VPC_Module/output.tf
+
+output "Virtual_Private_id"{
+  value = aws_vpc.VPCA.id
+}
+output "subnet_id"{
+  value = aws_subnet.subnetA.id
+}
+
+
+#filename: DEV-env/provider.tf
+
+provider "aws"{
+  access_key = ""
+  secret_key = ""
+  region = "ap-south-2"
+}
+
+module "vpc" {
+  source = ./Infra_Module/VPC_Module
+  VPCA-CIDR = 10.0.0.0/16
+  subAIP = 10.0.1.0/24
+}
+
+module "igw" {
+  source = ./Infra_module/IGW_Module
+  vpc_id = module.vpc.Virtual_Private_id #module.<moduleName>.<outputName>
+
+```
+
+- Always `initialize` the modules when new one is created
+
 
 ## 7. RDS using Secret Manager
+
+After creating the RDS required resources using the terraform.
+
+filename: secret.tf
+
+```hcl
+resource "aws_secretmanager_secret" "Rdsadmincred"{
+  name = "Rdsadmincred"
+}
+
+resource "aws_secretmanager_secrets_version" "Rdsadmincred"{
+  secret_id = aws_secretmanager_secret.Rdsadmincred.id
+  secret_string = jsonencode(var.Rdsadmincred)
+
+}
+
+variable "Rdsadmincred"P{
+  default = {
+    username = "admin"
+    password = "Password@123"
+  }
+  type = map(string)
+}
+
+locals{
+  Rdsadmincred = jsondecode(
+    aws_secretmanager_secret_version.Rdsadmincred.secret_string
+  )
+}
+
+```
+
+filename: rds.tf
+```hcl
+resource "aws_db_instance" "default{
+  allocated_storage = 10
+  db_name = "mydb"
+  engine = "mysql"
+  engine_version = "8.0"
+  instance_class = "db.t3.micro"
+  username = local.Rdsadmincred.username
+  password = local.Rdsadmincred.password
+  parameter_group_name = "default.mysql.0"
+  skip_final_snapshot = true
+}
+
+```
+
+
+ - secretmanager rotation
+ - secretmanager random password
 
 
 ## 8. Provisioner in Terraform
