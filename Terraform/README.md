@@ -898,7 +898,6 @@ resource "aws_db_instance" "default{
 
 ```
 
-
  - secretmanager rotation
  - secretmanager random password
 
