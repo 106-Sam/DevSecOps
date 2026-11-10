@@ -904,3 +904,145 @@ resource "aws_db_instance" "default{
 
 ## 8. Provisioner in Terraform
 
+
+#### Interview Points
+- If we created an VPC via Terraforom and add a tag from AWS console. And if we rerun the same terraform code `terraform apply --auto-approve`. The Tag gets removed from the VPC.
+- If we created an VPC via Terraform and create a subnet to that manually via AWS Console. And if we rerun the same terraform code `terraform apply --auto-approve`. Ths subnet doesn't get deleted as it is a different resource which isn't listed in the code. We can instead use data source block to know what all subnets are created.
+
+#### How to create multiple subnet quickly using terraform
+
+
+filename: network.tf
+```hcl
+resource "aws_vpc" "VPCA"{
+  cidr_block = var.IPadd
+  tags = {
+    Name = "VPCA"
+  }
+}
+
+resource "aws_subnet" "Subnetss"{
+  count = length(var.subnet_cidr_block)
+  vpc_id = aws_vpc.VPCA.id
+  cidr_block = var.subnet_cidr_block[count.index]
+}
+```
+
+
+filename: variable.tf
+```hcl 
+  variable "subnet_cidr_block"{
+    type = list
+    default = ["10.0.1.0/24","10.0.2.0/24","10.0.3.0/24"]
+  }
+```
+
+#### Provisioner Terraform
+
+ Terraform is usually a binary file. it can't execute by itself.
+
+- Usually whatever code we write in the terraform `main.tf` this code utilizes `Provider plugins` to execute. 
+  
+- `Provider plugins` internally connect to the `SDK` (software development kit)
+- From `SDK` it uses `RESTAPIs` and connect to the cloud (AWS, GCP, AZURE)
+
+We use provisioner to copy the local files (some.sh or etc) to the remote machine(like EC2 Instance) while creating
+
+List of provisioner that can be used to copy the local file to the EC2 instance via Terraform:
+1. `file` - this provisioner paste the local file to the EC2 instance
+2. `remote exec` - This provisioner execute commands in the remote server (EC2 Instance)
+3. `local exec` - This provisioner execute commands in the local laptop 
+
+For Linux VM, it uses `SSH` to copy/connect to the machine.
+For Window VM, it uses `WINRM` to copy/connect to the machine.
+
+Terraform is only partially configure mangaing tool..we usually use the Ansible as it is fully configure managing tool.
+
+![alt text](files/image3.png)
+
+- created all the required resources for ec2 and copy a key to the local repoistory as `somekey.pem` file
+- Create a file `nginx.sh` or whatever as per your requirement
+
+filename: nginx.sh
+```bash
+#!/bin/bash
+sudo sudo 
+apt update
+apt install nginx -y
+
+```
+
+filename: ec2.tf
+```hcl 
+
+# 1. Setup the Security Group to allow SSH access
+resource "aws_security_group" "allow_ssh" {
+  name        = "allow_ssh"
+  description = "Allow inbound SSH traffic for provisioning"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Restrict this to your IP in production
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "ServerA"{
+  ami = "ami-xxxxxxx"
+  instance_type = "t3.micro"
+  associate_public_ip_address = true
+  key_name = "somekey"
+  subnet_id = aws_subnet.subnet.id
+}
+  # The connection block tells the provisioner how to communicate with the instance
+  connection {
+    type        = "ssh"
+    user        = "ubuntu" # Change to "ec2-user" for Amazon Linux / RHEL
+    private_key = file("somekey.pem")
+    host        = self.public_ip
+  }
+
+  # Copies a single file/folder
+  provisioner "file" {
+    source      = "nginx.sh"
+    destination = "~/nginx.sh"
+  }
+  
+  # Remote Execution 
+  provisioner "remote-exec"{
+    inline = [
+     "bash ~/nginx.sh" 
+    ]
+  }
+  
+  # Local Execution
+  provisioner "local-exec"{
+    command = "echo 'Instance ${self.id} created with private IP ${self.private_id}' >> creation_log.txt"
+  }
+}
+
+```
+
+#### Critical Watchouts & Gotchas
+
+• Permission Denied Errors: You cannot upload files directly into restricted directories (like /var/www/html or /etc/nginx/) because the file provisioner connects as a non-root user (e.g., ubuntu or ec2-user). Fix: Always upload files to a temporary directory like /tmp/ first. If you need to move them later, use a remote-exec provisioner running a sudo mv command.
+• The Taint Behavior: If a file provisioner fails to copy your file (e.g., due to network timeouts or wrong SSH keys), Terraform will mark the entire resource as tainted. The next time you run terraform apply, Terraform will destroy and recreate that EC2 instance from scratch.
+• Missing SCP Dependency: If you are using SSH connections, the remote target system must have the scp service binary installed, or the file upload workflow will fail.
+
+#### Terraform taint & untaint & -replace
+
+The terraform taint command marks a specific infrastructure resource in your state file as "damaged" or "degraded," forcing Terraform to destroy and recreate it during the next apply loop. It allows you to trigger a complete resource rebuild without making any changes to your actual .tf configuration files.
+⚠️ Crucial Warning: The terraform taint command is deprecated as of `Terraform v0.15.2+`. You should use the -replace flag with terraform apply instead
+
+`terraform apply -replace="aws_instance.web_server"` - To replace or retry the building the infrastruture with new settings.
+`terraform taint <stateFileResource>` 
+`terraform untaint <stateFileResource>`
+
