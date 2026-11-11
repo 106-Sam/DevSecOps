@@ -4,12 +4,12 @@
 
 1. [Terraform Introduction](https://github.com/106-Sam/DevOps/tree/main/Terraform#1-terraform-introduction)
 2. [VPC Peering](https://github.com/106-Sam/DevOps/tree/main/Terraform#2-vpc-peering)
-3. [NAT Gateway]()
-4. [Backend Block]()
-5. [Datasource Block]()
-6. [Terraform Import]()
-7. [RDS using Secret Manager]()
-8. [Provisioner in Terraform]()
+3. [NAT Gateway](https://github.com/106-Sam/DevSecOps/tree/main/Terraform#3-nat-gateway)
+4. [Backend Block](https://github.com/106-Sam/DevSecOps/tree/main/Terraform#4-backend-block)
+5. [Datasource Block](https://github.com/106-Sam/DevSecOps/tree/main/Terraform#5-datasource--import-block)
+6. [Terraform Import](https://github.com/106-Sam/DevSecOps/tree/main/Terraform#6-terraform-import)
+7. [RDS using Secret Manager](https://github.com/106-Sam/DevSecOps/tree/main/Terraform#7-rds-using-secret-manager)
+8. [Provisioner in Terraform](https://github.com/106-Sam/DevSecOps/tree/main/Terraform#8-provisioner-in-terraform)
 
 
 
