@@ -107,6 +107,7 @@ To connect to the EKS, we require:
 
 
 To configure kubernetes:
+
 `aws eks --region ap-south-2 update-kubeconfig --name <Name>-cluster`
 
 
