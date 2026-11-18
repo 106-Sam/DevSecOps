@@ -3,6 +3,8 @@
 Index of Content
 
 1. [Day 1 - Kubernetes Introduction](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-1---kubernetes-introduction)
+2. [Day 2 - Kubernetes Components](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-2---kubernetes-components)
+3. 
 
 
 
@@ -111,3 +113,67 @@ To configure kubernetes:
 `aws eks --region ap-south-2 update-kubeconfig --name <Name>-cluster`
 
 
+## Day 2 - Kubernetes Fundamentals
+
+_Note: worker node and master node will always be in the EKS/AKS/GKE, etc but not outside it._
+
+#### Setting up machine for managing kubernetes
+
+1. AWS CLI:
+   - install aws-cli, and then `aws configure` (default installed in EC2 Instance)
+   - create IAM user, provide it a role to it and access keys.
+   - `aws eks --region ap-south-2 update-kubeconfig --name <Name>-cluster`
+   - `kubectl get nodes` - to check if the nodes are up or not.
+
+
+
+#### Kubernetes Commands 
+
+`kubectl get nodes` - to list out all the nodes available.
+
+`kubectl get nodes -o wide` - to list out extra things like External and Internal IP address, OS-version, Status, Age etc.
+
+`kubectl get service` - to list out the service it is running as, (by default it gets created as a ClusterIP)
+
+`kubectl run <podName> --image <imageName>` -  To create a pod with the specified image name.
+
+`kubectl get pod` - to list out the running/stopped pods (shows info like status, age, pods name, restarts).
+
+`kubectl get pod -o wides` - to list out the pods with some extra information like external ip address and working node detail.
+
+`kubectl describe pod <podName>` - to show more detailed information about the pod including the events. we can find the errors if something went wrong.
+
+`kubectl get all` - to list out all the nodes, services and pods at once.
+
+`kubectl delete pod/<podName>` - to delete the pod from default namespaces.
+
+`kubectl expose pod <podName> --type=LoadBalancer --port=80 --name=<nameofService>` - to expose existing pod at 80 port as a loadbalancer (works as a service as a loadbalancer)
+
+`kubectl logs <podName>` - to dump pod logs
+
+`kubectl logs -f <podName>` - to stream pod logs and access applications live logs.
+
+`` - 
+
+
+#### Kubernetes Fundamentals
+
+1. **Pod:** A POD is a single instance of an Application.
+   
+      - A POD is a smallest object, that can be created in kubernetes.
+  
+2. **ReplicaSet:** A ReplicaSet will maintain a stable set of replica Pods running at any given time. 
+      -  In short, it is often used to guarantee the availability of a specified number of identical Pods.
+3. **Deployment:** A deployment run multiple replicas of your application and automatically replaces any instances that fall or become unresponsive. 
+      -  Rollout & Rollback changes to applications.
+      -  Deployments are well-suited for the stateless applications.
+4. **Service:** A service is an abstraction for pods, providing a stable, so called virtual IP (VIP) address.
+      - In simple terms, service sits infront of a POD and acts as a load balancer.
+
+![alt text](files/image1.png)
+
+![alt text](files/image2.png)
+
+![alt text](files/image3.png)
+
+![alt text](files/image4.png)
