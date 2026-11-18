@@ -3,12 +3,52 @@
 Index of Content
 
 1. [Day 1 - Kubernetes Introduction](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-1---kubernetes-introduction)
-2. [Day 2 - Kubernetes Components](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-2---kubernetes-components)
-3. 
+2. [Day 2 - Kubernetes Fundamentals](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-2---kubernetes-fundamentals)
+3. [Day - 3 Kubernetes YAML file and namespaces](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-3---kubernetes-yaml-file-and-namespaces)
+4. 
 
 
+## Kubernetes Commands CheatSheet
 
+`kubectl get nodes` - to list out all the nodes available.
 
+`kubectl get nodes -o wide` - to list out extra things like External and Internal IP address, OS-version, Status, Age etc.
+
+`kubectl get service` - to list out the service it is running as, (by default it gets created as a ClusterIP)
+
+`kubectl run <podName> --image <imageName>` -  To create a pod with the specified image name.
+
+`kubectl get pod` - to list out the running/stopped pods (shows info like status, age, pods name, restarts).
+
+`kubectl get pod -o wides` - to list out the pods with some extra information like external ip address and working node detail.
+
+`kubectl describe pod <podName>` - to show more detailed information about the pod including the events. we can find the errors if something went wrong.
+
+`kubectl get all` - to list out all the nodes, services and pods at once.
+
+`kubectl delete pod/<podName>` - to delete the pod from default namespaces.
+
+`kubectl expose pod <podName> --type=LoadBalancer --port=80 --name=<nameofService>` - to expose existing pod at 80 port as a loadbalancer (works as a service as a loadbalancer)
+
+`kubectl logs <podName>` - to dump pod logs
+
+`kubectl logs -f <podName>` - to stream pod logs and access applications live logs.
+
+`kubectl exec -it <podName> -- /bin/bash` or `kubectl exec -it <podName> -- <shellPath>` - To connect to the pod and execute commands 
+
+`kubectl exec -it <podName> -- <bashCommands>` - to run individual commands in a container.
+
+`kubectl get pod <podName> -o yaml` - to get pod defined YAML formatted output.
+
+`kubectl get service <podName> -o yaml` - to get pod defined YAML formatted output.
+
+`kubectl apply -f <filename>.yaml/.yml` - to deploy the instruction written in the file.
+
+`kubectl describe rs <replicaSet-name>` or `kubectl describe rs/<replicaSet-name>` - to describe the newly created replicaSet
+
+`kubectl expose rs <ReplicaSet-Name> --type=LoadBalancer --port=80 --target-port=80 --name=<replicasetName-Service` - to expose replicaset with a service (LoadBalancer) to access the application externally (from internet)
+
+`kubectl delete -f <fileName>.yaml` - to delete all the resource done using deployment yaml files. (all together.)
 
 
 ## Day 1 - Kubernetes Introduction
@@ -49,7 +89,7 @@ IaaS(Infrastructure as a service):
 
 - In kubernetes, we call containers as pods.
 
-#### Kuberneters Components  
+#### Kubernetes Components  
 
 1. **Worker Node**: Worker Node is nothing but a docker container or any container engine.
 2. **Pod**: Pod is a smallest object that can be created under kubernetes. Pods can have a multiple containers as well (it is a abstraction layer over the container)
@@ -127,35 +167,6 @@ _Note: worker node and master node will always be in the EKS/AKS/GKE, etc but no
 
 
 
-#### Kubernetes Commands 
-
-`kubectl get nodes` - to list out all the nodes available.
-
-`kubectl get nodes -o wide` - to list out extra things like External and Internal IP address, OS-version, Status, Age etc.
-
-`kubectl get service` - to list out the service it is running as, (by default it gets created as a ClusterIP)
-
-`kubectl run <podName> --image <imageName>` -  To create a pod with the specified image name.
-
-`kubectl get pod` - to list out the running/stopped pods (shows info like status, age, pods name, restarts).
-
-`kubectl get pod -o wides` - to list out the pods with some extra information like external ip address and working node detail.
-
-`kubectl describe pod <podName>` - to show more detailed information about the pod including the events. we can find the errors if something went wrong.
-
-`kubectl get all` - to list out all the nodes, services and pods at once.
-
-`kubectl delete pod/<podName>` - to delete the pod from default namespaces.
-
-`kubectl expose pod <podName> --type=LoadBalancer --port=80 --name=<nameofService>` - to expose existing pod at 80 port as a loadbalancer (works as a service as a loadbalancer)
-
-`kubectl logs <podName>` - to dump pod logs
-
-`kubectl logs -f <podName>` - to stream pod logs and access applications live logs.
-
-`` - 
-
-
 #### Kubernetes Fundamentals
 
 1. **Pod:** A POD is a single instance of an Application.
@@ -170,6 +181,8 @@ _Note: worker node and master node will always be in the EKS/AKS/GKE, etc but no
 4. **Service:** A service is an abstraction for pods, providing a stable, so called virtual IP (VIP) address.
       - In simple terms, service sits infront of a POD and acts as a load balancer.
 
+##### 1. POD
+
 ![alt text](files/image1.png)
 
 ![alt text](files/image2.png)
@@ -177,3 +190,13 @@ _Note: worker node and master node will always be in the EKS/AKS/GKE, etc but no
 ![alt text](files/image3.png)
 
 ![alt text](files/image4.png)
+
+
+##### 2. ReplicaSet
+
+![alt text](files/image5.png)
+![alt text](files/image6.png)
+![alt text](files/image7.png)
+
+
+## Day - 3 Kubernetes YAML file and namespaces
