@@ -5,17 +5,24 @@ Index of Content
 1. [Day 1 - Kubernetes Introduction](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-1---kubernetes-introduction)
 2. [Day 2 - Kubernetes Fundamentals](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-2---kubernetes-fundamentals)
 3. [Day - 3 Kubernetes YAML file and namespaces](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-3---kubernetes-yaml-file-and-namespaces)
-4. 
+4. [Day - 3 Kubernetes YAML file, namespaces, Sidecar container](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-4---kubernetes-yaml-file-namespaces-sidecar-container)
+5. [Day - 4 Kubernetes and HELM Chart]
 
 
 ## Kubernetes Commands CheatSheet
+
+#### Nodes Commands
 
 `kubectl get nodes` - to list out all the nodes available.
 
 `kubectl get nodes -o wide` - to list out extra things like External and Internal IP address, OS-version, Status, Age etc.
 
+#### Services Commands
 `kubectl get service` - to list out the service it is running as, (by default it gets created as a ClusterIP)
 
+`kubectl expose pod <podName> --type=LoadBalancer --port=80 --name=<nameofService>` - to expose existing pod at 80 port as a loadbalancer (works as a service as a loadbalancer)
+
+#### Pod Commands
 `kubectl run <podName> --image <imageName>` -  To create a pod with the specified image name.
 
 `kubectl get pod` - to list out the running/stopped pods (shows info like status, age, pods name, restarts).
@@ -28,28 +35,57 @@ Index of Content
 
 `kubectl delete pod/<podName>` - to delete the pod from default namespaces.
 
-`kubectl expose pod <podName> --type=LoadBalancer --port=80 --name=<nameofService>` - to expose existing pod at 80 port as a loadbalancer (works as a service as a loadbalancer)
 
+#### Logs Commands
 `kubectl logs <podName>` - to dump pod logs
 
 `kubectl logs -f <podName>` - to stream pod logs and access applications live logs.
+
+#### Executing Commands
 
 `kubectl exec -it <podName> -- /bin/bash` or `kubectl exec -it <podName> -- <shellPath>` - To connect to the pod and execute commands 
 
 `kubectl exec -it <podName> -- <bashCommands>` - to run individual commands in a container.
 
+#### YAML creation Commands
+
 `kubectl get pod <podName> -o yaml` - to get pod defined YAML formatted output.
 
 `kubectl get service <podName> -o yaml` - to get pod defined YAML formatted output.
 
+
+- `kubectl create deploy myapp --image nginx --dryrun -o yaml > deployment.yaml` - to create/generate a deployment.yaml file.
+
+#### Apply/delete and deploy Commands
+
 `kubectl apply -f <filename>.yaml/.yml` - to deploy the instruction written in the file.
 
+`kubectl delete -f <fileName>.yaml` - to delete all the resource done using deployment yaml files. (all together.)
+
+
+#### ReplicaSet Commands
 `kubectl describe rs <replicaSet-name>` or `kubectl describe rs/<replicaSet-name>` - to describe the newly created replicaSet
 
 `kubectl expose rs <ReplicaSet-Name> --type=LoadBalancer --port=80 --target-port=80 --name=<replicasetName-Service` - to expose replicaset with a service (LoadBalancer) to access the application externally (from internet)
 
-`kubectl delete -f <fileName>.yaml` - to delete all the resource done using deployment yaml files. (all together.)
+#### API reference resources
+  
+-  `kubectl api-resources` - to get the API reference related details like v1, short forms etc.
 
+#### Namespace Comamnds
+
+`kubectl get ns` or `kubectl get namespace` - to list out the existing namespaces (by default: default-namespace)
+
+`kubectl create ns <namespaceName>` - To create a new namespace in kubernetes
+
+`kubectl apply -f deployment.yaml --namespace <namespaceName` - to deploy the application in the specified namespace.
+
+`kubectl get pod --namespace <namespaceName>` - to list out the pods from the specified namespace
+
+`kubectl get all --namespace <namespaceName>` - to list out all the nodes, services and pods at once but from the specified namespace.
+
+---
+***
 
 ## Day 1 - Kubernetes Introduction
 
@@ -198,5 +234,175 @@ _Note: worker node and master node will always be in the EKS/AKS/GKE, etc but no
 ![alt text](files/image6.png)
 ![alt text](files/image7.png)
 
+## Day - 3 Kubernetes YAML file, namespaces, Sidecar container
 
-## Day - 3 Kubernetes YAML file and namespaces
+- YAML file can be of extension .yaml or .yml.
+- YAML is similar to markup language where it is user-friendly but only thing is to take care of the indentation.
+
+```yaml
+person: #dictonary
+      name: Sami # keyvalue pair
+      occupation: DevSecOps Engg. # keyvalue pair
+      city: Hyderabad # keyvalue pair
+      hobbies: #list
+       - basketball
+       - reading
+       - researching
+      friends: #list of dictonaries
+       - name: Khush
+         city: kanpur
+       - name: Ammarah
+         city: Hyderabad
+       - name: Veeni
+         city: London
+       - name: Sourav 
+         city: Bangalore
+       - name: Pragati
+         city: Hyderabad   
+```
+
+Kubernetes: [YAML API reference](https://kubernetes.io/docs/concepts/workloads/pods/)
+
+#### Example POD YAML
+
+filename: pod.yaml
+
+```yaml
+apiversion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      port: 80
+    - containerPort: 80
+```
+
+YAML Validator - [link](https://www.yamllint.com/)
+
+`kubectl apply -f pod.yaml` 
+`kubectl get pods` - this shows us the ip address of the node where it is deployed
+`kubectl get nodes` - this shows us all the nodes.
+`kubectl describe pod mypod` - to see the events
+
+> NOTE: 
+>  - We cannot see the master node as we are using AWS EKS service
+>  - Master Node is basically managed by AWS. Instead we can login and connect to the worker nodes.
+
+
+#### Example Service YAML
+
+filename: service.yaml
+
+```yaml
+apiversion: v1
+kind: Service
+metadata:
+  name: my-loadbalancer-svc
+spec:
+  type: LoadBalancer
+  selector: 
+    app: mypod
+  ports: 
+    - name: http
+      protocol: TCP
+      port: 80         #This port is exposed externally on the LoadBalancer
+      targetPort: 80
+
+```
+
+`kubectl get svc` - to list if there is any LoadBalancer service already running.
+`kubectl apply -f service.yaml` - to deploy the service.yaml file configuration.
+`kubectl get svc` - now we can see the kubernetes service that we just deployed.
+`kubectl delete -f service.yaml`
+or
+`kubectl get all`
+`kubectl delete pod/mypod`
+
+
+#### Example Pod & Service YAMl file together
+
+filename: deploy.yaml
+
+```yaml
+apiversion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: mypod
+      image: nginx
+      port: 80
+    - containerPort: 80
+
+---
+apiversion: v1
+kind: Service
+metadata:
+  name: my-loadbalancer-svc
+spec:
+  type: LoadBalancer
+  selector: 
+    app: mypod
+  ports: 
+    - name: http
+      protocol: TCP
+      port: 80         #This port is exposed externally on the LoadBalancer
+      targetPort: 80
+```
+
+- we have used "---" in between that is the document seperator.
+- `kubectl apply -f deploy.yaml`
+- ingress control
+
+#### To create a Deployament YAML file with kubectl 
+
+`kubectl create deploy myapp --image nginx --dryrun -o yaml > deployment.yaml`
+
+![alt text](files/image8.png)
+
+`kubectl apply -f deployment.yaml`
+
+#### To create a service YAML file with the kubectl 
+
+`kubectl expose deploy myapp --port=80 --type=LoadBalancer --dryrun -o yaml > service.yaml`
+
+![alt text](files/image9.png)
+
+`kubectl apply -f service.yaml`
+
+#### Namespace
+
+`kubectl get ns` or `kubectl get namespace` - to list out the existing namespaces (by default: default-namespace)
+
+`kubectl create ns <namespaceName>` - To create a new namespace in kubernetes
+
+`kubectl apply -f deployment.yaml --namespace <namespaceName` - to deploy the application in the specified namespace.
+
+`kubectl get pod --namespace <namespaceName>` - to list out the pods from the specified namespace
+
+`kubectl get all --namespace <namespaceName>` - to list out all the nodes, services and pods at once but from the specified namespace.
+
+
+#### Sidecar Container
+
+
+
+
+
+
+
+
+
+
+
+#### Day - 4 Kubernetes and Helm Charts
+
+
+
+
+
+![alt text](files/image10.png)
