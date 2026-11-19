@@ -5,7 +5,7 @@ Index of Content
 1. [Day 1 - Kubernetes Introduction](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-1---kubernetes-introduction)
 2. [Day 2 - Kubernetes Fundamentals](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-2---kubernetes-fundamentals)
 3. [Day 3 - Kubernetes YAML file, namespaces, Sidecar container](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-3---kubernetes-yaml-file-namespaces-sidecar-container)
-4. [Day 4 - Kubernetes and HELM Chart]
+5. [Day 4 - Kubernetes and HELM Chart]
 
 
 ## Kubernetes Commands CheatSheet
@@ -233,7 +233,7 @@ _Note: worker node and master node will always be in the EKS/AKS/GKE, etc but no
 ![alt text](files/image6.png)
 ![alt text](files/image7.png)
 
-## Day - 3 Kubernetes YAML file, namespaces, Sidecar container
+## Day 3 - Kubernetes YAML file, namespaces, Sidecar container
 
 - YAML file can be of extension .yaml or .yml.
 - YAML is similar to markup language where it is user-friendly but only thing is to take care of the indentation.
@@ -386,19 +386,93 @@ spec:
 `kubectl get all --namespace <namespaceName>` - to list out all the nodes, services and pods at once but from the specified namespace.
 
 
-#### Sidecar Container
+#### Sidecar Container (Multi-Container Pod)
+
+- Sidecar container is nothing but a helping container for the main container.
+- It is used to pull data required by the main container.
+- It is used to push data by collecting from main container (logs)
+- It writes static data to the html files Helper Container and Reads using Main Containers.
+
+![alt text](files/image11.png)
+
+```yaml
+
+apiversion: v1
+kind: Deployment
+metadata: 
+  creationTimestamp: null
+  labels:
+    app: nginx-webapp
+  name: nginx-webapp
+spec: 
+  replicas: 2 
+  selector: 
+    matchLabels 
+      app:nginx-webapp
+
+strategy: {}
+template: 
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: nginx-null
+  spec:
+    containers:
+      - image: busybox
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo echo $(date -u)] 'Hi I am from Sidecar container1' >> /var/log/index.html; sleep 5; done"]
+        name: sidecar-container1
+        resource: {}
+        volumeMount: 
+          - name: var-logs
+            mount: /var/log
+
+      - image: busybox
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo echo $(date -u)] 'Hi I am from Sidecar container2' >> /var/log/index.html; sleep 5; done"]
+        name: sidecar-container2
+        resource: {}
+        volumeMount: 
+          - name: var-logs
+            mount: /var/log
+
+      - image: nginx
+        name: main-container
+        resource: {}
+        ports: 
+          - containerPort: 80
+      volumeMounts: 
+      - name: var-logs
+        mountPath: /usr/share/nginx/html
+      dnsPolicy: Default
+      volumes: 
+        - name: var-logs:
+          emptyDir: {}
+status: {}
+
+---
+
+apiversion: v1
+kind: Service
+metadata : 
+  name: nginx-webapp
+  labels: 
+    run: nginx-webapp
+
+spec: 
+  ports: 
+    - port: 80
+      protocol : TCP
+  selector: 
+    app: nginx-web
+  type: LoadBalancer         
+
+```
+
+`kubectl apply -f sidecar.yaml`
 
 
-
-
-
-
-
-
-
-
-
-#### Day - 4 Kubernetes and Helm Charts
+## Day 4 - Kubernetes and Helm Charts
 
 
 
