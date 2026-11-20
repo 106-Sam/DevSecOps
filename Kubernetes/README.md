@@ -179,7 +179,7 @@ IaaS(Infrastructure as a service):
 To connect to the EKS, we require:
 1. aws cli => aws portal - [click here](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#:~:text=The-,install,-script%20downloads%2C%20verifies)
 2. terraform install - [click here](https://developer.hashicorp.com/terraform/install)
-3. EKS install - [click here]()
+3. EKS install - [click here](https://github.com/eksctl-io/eksctl)
 4. kubectl commands - [click here](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-binary-with-curl-on-linux)
 
 
@@ -472,7 +472,9 @@ spec:
 `kubectl apply -f sidecar.yaml`
 
 
-## Day 4 - Kubernetes and Helm Charts
+## Day 4 - Kubernetes ConfigMap and Helm Charts
+
+
 
 
 
