@@ -89,6 +89,13 @@ Index of Content
 `kubectl get cm ` - to list out the existing ConfigMaps
 `kubectl describe cm <configMapNames>` - To describe the specified ConfigMap 
 
+#### Secrets Commands
+
+`kubectl create secret generic <secretName> --from-literal=<passValue>` - to create and pass a secret value.
+
+`kubectl describe secret <secretName>` - to describe the exisiting secrets
+
+`kubectl edit secret <secretName>` - to edit the secrets files/view secret file
 
 ---
 ***
@@ -686,8 +693,51 @@ data:
 
 #### Kubernetes Secrets
 
+#### Example secret yaml
+filename: secrets.yaml
+```yaml
+apiVersion: v1
+kind: Secret
+metadata: 
+  name: my-app-secret
+  namespace: default
+
+type: Opaque
+data:
+  # Value must be base64 encoded without newlines
+  username: YWRtaW4=      # admin
+  password:                 # supersecret
+
+  # Kubernetes automatically encodes plain-text values in stringData
+  api-key: "my-plain-text-api-key"
+```
 
 
-#### Helm Charts Secrets
+`kubectl create secret generic test-secret --from-literal=db-port="3306"`
+
+`kubectl describe secret test-secret`
+
+`kubectl edit secret test-secret`
+
+
+#### Helm Charts
+
+- Helm Chart is a package manager for the kubernetes. We normally package all the yaml file and give it a name.
+- Helm Charts solve the problem of deploy multiple yaml files.
+
+Helm installation - [click here](https://helm.sh/docs/intro/install/)
+
+#### demo to create a helm 
+
+`sudo helm create myapp`
 
 ![alt text](files/image10.png)
+
+- Chart.yaml - it is for the chart defination
+- charts directory - it is for the dependency files
+- templates directory - We write the deployment yaml files in the templates
+
+`helm install myapp` - to install the helm chart
+`helm uninstall myapp` - to uninstall the helm chart
+`helm upgrade myapp` - to upgrade the helm chart
+`helm rollback myapp 1` - to rollback to a specific part in helm chart
