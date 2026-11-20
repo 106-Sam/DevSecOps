@@ -5,7 +5,8 @@ Index of Content
 1. [Day 1 - Kubernetes Introduction](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-1---kubernetes-introduction)
 2. [Day 2 - Kubernetes Fundamentals](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-2---kubernetes-fundamentals)
 3. [Day 3 - Kubernetes YAML file, namespaces, Sidecar container](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-3---kubernetes-yaml-file-namespaces-sidecar-container)
-5. [Day 4 - Kubernetes and HELM Chart]
+5. [Day 4 - Kubernetes ConfigMap, Secrets and Helm Charts](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-4---kubernetes-configmap-secrets-and-helm-charts)
+6. [Day 5 - ]
 
 
 ## Kubernetes Commands CheatSheet
@@ -82,6 +83,12 @@ Index of Content
 `kubectl get pod --namespace <namespaceName>` - to list out the pods from the specified namespace
 
 `kubectl get all --namespace <namespaceName>` - to list out all the nodes, services and pods at once but from the specified namespace.
+
+#### ConfigMaps Commands
+
+`kubectl get cm ` - to list out the existing ConfigMaps
+`kubectl describe cm <configMapNames>` - To describe the specified ConfigMap 
+
 
 ---
 ***
@@ -472,12 +479,215 @@ spec:
 `kubectl apply -f sidecar.yaml`
 
 
-## Day 4 - Kubernetes ConfigMap and Helm Charts
+## Day 4 - Kubernetes ConfigMap, Secrets and Helm Charts
+
+A **ConfigMap** is a Kubernetes API object used to store non-confidential configuration data as key-value pairs.
+
+The problem that `ConfigMap` solves is if the configuration like dbport and all are configured by us after connecting to the pod. In case, the pod crashes and new pod spawns, we need to do all that steps manually. Instead, we can use `ConfigMap` and provide it the values.
+
+We can use two methods,
+1. Environment Variable - If using Env variable, and change data in the ConfigMap file the pods needs to restart pods to get the changes apply.
+2. Filesystem Volumes - If using volume, and changed data in ConfigMap file the running pod data is automatically get changes.
+3. Kubernetes stores ConfigMaps in its etcd datastore. You shouldn't directly edit etcd data; instead, use Kubernetes API server and Kubectl to create and manage your ConfigMaps.
+
+
+```text
+Kubernetes ConfigMap is a built-in Kubernetes API object that’s designed to store your application’s non-sensitive key-value config data. ConfigMaps allow you to keep config values separate from your code and container images. Values can be strings or Base64-encoded binary data.
+Once you’ve created a ConfigMap, its content will be saved to your Kubernetes cluster. Pods can then consume the ConfigMap’s values as environment variables, command line arguments, or filesystem volumes.
+
+ConfigMaps are intended to store relatively small amounts of simple data. The total size of a ConfigMap object must be less than 1 MiB. If you need to store more data, you should split your configuration into multiple ConfigMaps or consider using a separate database or key-value store.
+It’s good practice to use a ConfigMap to supply any configurable values that your app needs at runtime. The key-value pairs within the ConfigMap can be injected directly into your Pods in several different formats. Because ConfigMaps are part of the Kubernetes API, it’s possible to alter their values without re-deploying your app’s Pods.
+
+
+```
+Interview Prep - [Click here](https://docs.google.com/document/d/1CkKLztqDNX2JKr2urSqa8bqo32VxL8TH/edit)
+
+
+#### To create our own ConfigMap (without ENV/Volumes)
+
+`kubectl get cm ` - to list out the existing ConfigMaps
+
+filename: cm.yaml
+```yaml
+apiversion: v1
+kind: ConfigMap
+metadata:
+  name: test-cm
+data:
+  db-port: 3306
+```
+
+`kubectl apply -f cm.yaml` 
+`kubectl get cm`
+`kubectl describe cm test-cm` - To describe the specified ConfigMap 
+
+```yaml
+apiversion: v1
+kind: Deployment
+metadata:
+  name: myapp1-deployment
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: myapp1
+  template: 
+    metadata: # Dictonary
+      name: myapp1-Pod
+      labels: # Dictonary
+        app: myapp1
+      spec: 
+        containers: #List
+          - name: myapp1-container
+            image: kuchalakantikris/my_nginx_image1:v1
+            ports:
+              - containerPort: 80
+
+```
+
+`kubectl apply -f deployment.yaml`
+`kubectl get pods` 
+`kubectl exec -it myapp1-deployment-xxxxx-xx -- /bin/bash `
+> $ env
+>
+> $ export DB_PORT=3306
+> 
+> $ env
+
+`kubectl delete pod myapp1-deployment-xxxx-xx` 
+
+Now, after delete the new pod will not have that same value/configuration.
+
+`kubectl delete -f deployment.yaml`
+
+#### To create our own ConfigMap (with Environment Variable)
+
+```yaml
+apiversion: v1
+kind: Deployment
+metadata: 
+  name: myapp1-deployment
+spec: 
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: myapp1
+  template: 
+    metadata: # Dictonary
+      name: myapp1-pod 
+      labels: 
+        app: myapp1
+      spec: 
+        containers: # List
+          - name: myapp1-container
+            image: kuchalakantikris/my_nginx_image1:v1
+            env: 
+              - name: DB-PORT
+                valueFrom:
+                  configMapKeyRef: 
+                    name: test-cm
+                    key: db-port
+
+            ports:
+              - containersPort: 80
+```
+
+filename: cm.yaml
+```yaml
+apiversion: v1
+kind: ConfigMap
+metadata: 
+  name: test-cm
+data:
+  db-port: "3306"
+
+```
+`kubectl get pods`
+
+`kubectl exec -it pod -- env`
+
+- Even if we delete the pods the environment variable values will be there.
+
+Now if i want to change the value of that particular environment variable in runtime:
+- I will edit the configmap
+  
+filename: cm.yaml
+```yaml
+apiversion: v1
+kind: ConfigMap
+metadata: 
+  name: test-cm
+data:
+  db-port: "3307"
+
+```
+
+`kubectl apply -f cm.yaml`
+
+`kubectl describe cm test-cm` 
+
+- The value has even changed when we see describe the configmap service 
+- But there was no change on the Running Pods
+
+`kubectl delete pod *` 
+
+- And after new pods are created now we can see that values changed.
+- Hence, we need to restart the pods to change the values at the runtime.
+
+#### To create our own ConfigMap (with Filesystem Volumes)
+
+```yaml
+apiversion: v1
+kind: Deployment
+metadata: 
+  name: myapp1-deployment
+spec: 
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: myapp1
+  template: 
+    metadata: # Dictonary
+      name: myapp1-pod 
+      labels: 
+        app: myapp1
+      spec: 
+        containers: # List
+          - name: myapp1-container
+            image: kuchalakantikris/my_nginx_image1:v1
+            volumeMounts: 
+              - name: db-connection
+                mountPath: /opt
+            ports:
+              - containersPort: 80
+        volumes: 
+          - name: db-connection
+            configMap: 
+              name: test-cm 
+```
+
+filename: cm.yaml
+```yaml
+apiversion: v1
+kind: ConfigMap
+metadata: 
+  name: test-cm
+data:
+  db-port: "3306"
+
+```
+`kubectl deploy -f deployment.yaml` 
+
+`kubectl exec -it <pod> -- /bin/bash` 
+
+> $ cat /opt/db-port
+
+- if we change the value and deploy again with configmap yaml it changes at the runtime.
+
+#### Kubernetes Secrets
 
 
 
-
-
-
+#### Helm Charts Secrets
 
 ![alt text](files/image10.png)
