@@ -7,6 +7,7 @@ Index of Content
 3. [Day 3 - Kubernetes YAML file, namespaces, Sidecar container](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-3---kubernetes-yaml-file-namespaces-sidecar-container)
 5. [Day 4 - Kubernetes ConfigMap, Secrets and Helm Charts](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-4---kubernetes-configmap-secrets-and-helm-charts)
 6. [Day 5 - Helm Charts, Ingress-controller](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-5---helm-charts-ingress-controller)
+7. [Day 6 - ]()
 
 
 ## Kubernetes Commands CheatSheet
