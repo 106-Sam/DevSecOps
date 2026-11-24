@@ -6,7 +6,7 @@ Index of Content
 2. [Day 2 - Kubernetes Fundamentals](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-2---kubernetes-fundamentals)
 3. [Day 3 - Kubernetes YAML file, namespaces, Sidecar container](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-3---kubernetes-yaml-file-namespaces-sidecar-container)
 5. [Day 4 - Kubernetes ConfigMap, Secrets and Helm Charts](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-4---kubernetes-configmap-secrets-and-helm-charts)
-6. [Day 5 - ]
+6. [Day 5 - Helm Charts, Ingress-controller](https://github.com/106-Sam/DevSecOps/tree/main/Kubernetes#day-5---helm-charts-ingress-controller)
 
 
 ## Kubernetes Commands CheatSheet
@@ -97,7 +97,27 @@ Index of Content
 
 `kubectl edit secret <secretName>` - to edit the secrets files/view secret file
 
+#### Ingress Commands
+
+`kubectl get ingress` - to list out the ingress controller Path routing
+
 ---
+
+## Helm Cheatsheet
+
+`helm install <appName> .` - to install a helm package from the chart.yaml file from the present directory.
+
+`helm uninstall <appName>` - to uninstall a helm package.
+
+`helm upgrade <appName> .` - to upgrade the helm package after editing the yaml files from the present directory.
+
+`helm upgrade <appName> . --set replicaCount=3` - to upgrade the helm package once the variable are declare and values can be passed via cli.
+
+`helm history <appName>` = to check the history of the app. (can be used for rollback)
+
+`helm rollback <appName> <RevisionNumber>` - to rollback to a specific version and provide the revision number.
+
+
 ***
 
 ## Day 1 - Kubernetes Introduction
@@ -492,10 +512,12 @@ A **ConfigMap** is a Kubernetes API object used to store non-confidential config
 
 The problem that `ConfigMap` solves is if the configuration like dbport and all are configured by us after connecting to the pod. In case, the pod crashes and new pod spawns, we need to do all that steps manually. Instead, we can use `ConfigMap` and provide it the values.
 
-We can use two methods,
+We can use three methods,
 1. Environment Variable - If using Env variable, and change data in the ConfigMap file the pods needs to restart pods to get the changes apply.
 2. Filesystem Volumes - If using volume, and changed data in ConfigMap file the running pod data is automatically get changes.
-3. Kubernetes stores ConfigMaps in its etcd datastore. You shouldn't directly edit etcd data; instead, use Kubernetes API server and Kubectl to create and manage your ConfigMaps.
+3. Command Line Arguments 
+
+Kubernetes stores ConfigMaps in its etcd datastore. You shouldn't directly edit etcd data; instead, use Kubernetes API server and Kubectl to create and manage your ConfigMaps.
 
 
 ```text
@@ -741,3 +763,201 @@ Helm installation - [click here](https://helm.sh/docs/intro/install/)
 `helm uninstall myapp` - to uninstall the helm chart
 `helm upgrade myapp` - to upgrade the helm chart
 `helm rollback myapp 1` - to rollback to a specific part in helm chart
+
+
+## Day - 5 Helm Charts, Ingress Controller
+
+- What is the use of ConfigMap ?
+Ans. The use for configmap is to store and pass value to the Kubernetes Pod.
+
+- How much size should ConfigMap be?
+Ans. Less than 1Mib
+
+- How many ways we can pass the values?
+Ans. Three ways - Environment Variable, CLI arguments, Filesystem volumes
+
+- What is the difference between environment variable and Filesystem volumes?
+Ans. Environment variable doesn't change the value at Runtime therefore, we need to restart the pod. Whereas Filesystem volumes do change the values at Runtime.
+
+- How to create container ?
+Ans. Pod and container are the same. And Pod can have multiple containers.
+
+![alt text](files/image12.png)
+
+#### Creation of helm package
+
+`mkdir myapp`
+```yaml
+vi Charts.yaml
+
+apiVersion: v2
+name: myapp
+version: 0.1.0
+appVersion: 1.0
+description: A Helm Chart for kubernetes
+```
+
+`mkdir templates`
+`cd templates`
+`kubectl create deploy myapp --image nginx --dry-run -o yaml > deployment.yaml`
+`cd ..`
+`aws eks --region ap-south-2 update-kubeconfig --name krishna-cluster`
+`kubectl get nodes`
+`helm install myapp .`
+`kubectl get pods` #it shows the created pod from myapp.
+`helm uninstall myapp` 
+
+
+#### Increasing replicas in deployment.yaml
+
+`helm install myapp .`
+
+```yaml
+vi templates/deployments.yaml
+
+apiVersion: app/v1
+kind: Deployment
+metadata: 
+  labels: 
+    app: myapp
+  name: myapp
+spec: 
+  replicas: 3 # changed 1 to 3
+  selector: 
+    matchLabels: 
+      app: myapp
+  strategy: {}
+  template: 
+    metadata: 
+      labels: 
+        app: myapp
+    spec: 
+      containers: 
+        - image: nginx
+          name: ngixn
+          resource: {}
+status: {}
+```
+
+- if we want we can change the app version in the chart.yaml file.
+
+```yaml 
+vi chart.yaml
+
+apiVersion: v2
+name: myapp
+version: 0.1.1
+appVersion: 1.0
+description: A Helm Chart for kubernetes
+```
+`helm upgrade myapp .`
+`kubectl get pods`  # we will see 3 pods as replicas to 3
+
+#### If we want to rollback to specific version
+`helm history myapp` 
+`helm rollback myapp 1` - check the history and write the number sequel as per requirement.
+`kubectl get pods`  # pods changed to 1 but didn't change the replica value 
+
+
+
+`cd templates`
+`kubectl expose deploy myapp --port 80 --type=LoadBalancer --dry-run -o yaml > service.yaml`
+`helm upgrade myapp .`
+
+`kubectl gets pods` # 3 pods 
+`kubectl get nodes` # new service loadbalancer is added. 2 services
+
+`helm rollback myapp 1` # it again roll back to 1 pod 1 service.
+
+#### Passing Variable and values
+
+```yaml 
+vi templates/deployments.yaml
+
+apiVersion: app/v1
+kind: Deployment
+metadata: 
+  labels: 
+    app: myapp
+  name: myapp
+spec: 
+  replicas: {{.Values.replicaCount}}
+  selector: 
+    matchLabels: 
+      app: myapp
+  strategy: {}
+  template: 
+    metadata: 
+      labels: 
+        app: myapp
+    spec: 
+      containers: 
+        - image: nginx
+          name: ngixn
+          resource: {}
+status: {}
+
+```
+`touch values.yaml` 
+```yaml 
+vi values.yaml
+
+replicaCount: 1
+```
+`helm install myapp .`
+
+- Once we have declared a variable we can give the values from the commandline arguments as well.
+  
+`helm upgrade myapp . --set replicaCount=3`
+
+`kubectl get pods`
+
+#### HELM Charts Repository 
+
+[helm.sh](https://helm.sh)
+
+And click Charts in the menu
+
+
+We have installed Postgresql it didnt work due to volume storage less
+Hence, we did instal nginx by copy paste from bitnami
+Then, prometheus
+
+
+#### Ingress Controller
+
+Basically, Ingress Controller helps us reduce the cost without using the Load Balancers.
+
+If 2 servers are deployed like nginx and Httpd in a same cluster, we need 2 load balancer to access them. Instead we can use Ingress Controller, which will act as a load balancer. 
+
+
+we can access application using 1 PublicIP and using default routing rules
+- publicIP/nginx - nginx server
+- publicIP/httpd - httpds Server
+
+
+So, instead of using multiple load balancer, we can use ingress-controller with Path based routing rules.
+
+link is here 
+
+https://github.com/kubernetes/ingress-nginx/blob/controller-v1.2.1/deploy/static/provider/cloud/deploy.yaml
+
+`kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/refs/tags/controller-v1.2.1/deploy/static/provider/cloud/deploy.yaml`
+
+ingress controller is created in the namespace `ingress-nginx`
+
+`kubectl get pods --namespace ingress-nginx`
+
+- created nginx.yml & httpd.yml file
+
+`kubectl apply -f nginx.yml`
+`kubectl apply -f httpd.yaml` 
+
+create a ingress-resource backend linked httpd and nginx yaml
+
+`kubectl apply -f ingress-resource.yaml`
+
+`kubectl get ingress`
+
+- we need to get the link from ALB till then wait
+- after that we can access nginx and httpd with path routing
