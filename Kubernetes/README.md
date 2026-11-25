@@ -962,3 +962,6 @@ create a ingress-resource backend linked httpd and nginx yaml
 
 - we need to get the link from ALB till then wait
 - after that we can access nginx and httpd with path routing
+
+
+## Day 6 - 
