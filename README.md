@@ -8,6 +8,7 @@
 4. [Git & Github](https://github.com/106-Sam/DevOps/tree/main/Git%20%26%20Github#git-and-github)
 5. [Docker](https://github.com/106-Sam/DevOps/tree/main/Docker#docker)
 6. [Kubernetes](https://github.com/106-Sam/DevOps/tree/main/Kubernetes#kubernetes)
+7. [Ansible](https://github.com/106-Sam/DevOps/tree/main/Ansible#ansible)
 
 
 
